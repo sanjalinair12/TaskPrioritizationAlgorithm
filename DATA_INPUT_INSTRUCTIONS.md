@@ -12,4 +12,14 @@ Now select the Files option in google colab from the left corner of the Google C
 
 <img width="1617" height="573" alt="image" src="https://github.com/user-attachments/assets/a86461c2-dcfb-4b90-bcbf-c34f6433dcb0" />
 
+Upload the input file robot_criteria.xlsx provided in this repository.
+<img width="1619" height="578" alt="image" src="https://github.com/user-attachments/assets/2bd6073a-ebfd-46f8-9830-bb08b8127c00" />
+
+Once the File is successfully uploaded, click on the three dots on the right side of the file name and copy the file path.
+<img width="1892" height="465" alt="image" src="https://github.com/user-attachments/assets/f07dc760-95ae-488d-82ab-3ffbcea2bcc2" />
+
+Once the File path is given the system will execute the algorithm as shown below.
+<img width="1486" height="430" alt="image" src="https://github.com/user-attachments/assets/2e9e30ec-3cc7-47ba-b55e-f767d1008000" />
+
+
 
