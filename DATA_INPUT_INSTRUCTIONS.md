@@ -11,7 +11,7 @@ Once the user selects option 2, the system prompts the user to provide the file 
 
 Now select the Files option in Google Colab from the left corner of the Google Colab Output Window, as shown below.
 
-<img width="1617" height="573" alt="image" src="https://github.com/user-attachments/assets/a86461c2-dcfb-4b90-bcbf-c34f6433dcb0" />
+<img width="1617" height="573" alt="image" src="images/Screenshot 2025-09-17 115825.png" />
 
 Upload the input file robot_criteria.xlsx provided in this repository.
 <img width="1619" height="578" alt="image" src="https://github.com/user-attachments/assets/2bd6073a-ebfd-46f8-9830-bb08b8127c00" />
