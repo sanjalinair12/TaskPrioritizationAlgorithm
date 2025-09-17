@@ -8,3 +8,8 @@ Once the user selects option 2, the system promts the user to provide the file p
 
 <img width="1488" height="217" alt="image" src="https://github.com/user-attachments/assets/bb55c5ac-89fd-4a13-bb3f-0c6dee50daaf" />
 
+Now select the Files option in google colab from the left corner of the Google Colab Ouput Window as shown below.
+
+<img width="1617" height="573" alt="image" src="https://github.com/user-attachments/assets/a86461c2-dcfb-4b90-bcbf-c34f6433dcb0" />
+
+
