@@ -14,7 +14,7 @@ Now select the Files option in Google Colab from the left corner of the Google C
 <img width="1617" height="573" alt="image" src="images/Screenshot 2025-09-17 115825.png" />
 
 Upload the input file robot_criteria.xlsx provided in this repository.
-<img width="1619" height="578" alt="image" src="https://github.com/user-attachments/assets/2bd6073a-ebfd-46f8-9830-bb08b8127c00" />
+<img width="1619" height="578" alt="image" src="images/Screenshot 2025-09-17 120134.png" />
 
 Once the File is successfully uploaded, click on the three dots on the right side of the file name and copy the file path.
 <img width="1892" height="465" alt="image" src="https://github.com/user-attachments/assets/f07dc760-95ae-488d-82ab-3ffbcea2bcc2" />
