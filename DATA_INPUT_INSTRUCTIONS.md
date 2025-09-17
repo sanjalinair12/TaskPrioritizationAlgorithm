@@ -1,4 +1,4 @@
-For the Search&Rescue_with_input_options.py File, an input File in Excel format is to be provided by the user for execution. This option has been provided for the user's convenience. If you wish to provide the input through an external file choose this format.
+For the Search&Rescue_with_input_options.py File, an input File in Excel format is to be provided by the user for execution. This option has been provided for the user's convenience. If you wish to provide the input through an external file, choose this format.
 The robot_criteria.xlsx Excel file contains the criteria comparison matrix, robot specifications, and task scores for the algorithm to execute.
 Once the code is executed, a prompt, as shown in the figure below, will be available for the user to choose from, allowing them to either select an input file for execution or manually enter the values.
 <img width="1488" height="217" alt="image" src="images/Figure_1.png" />
