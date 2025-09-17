@@ -1,0 +1,260 @@
+import numpy as np
+import pandas as pd
+
+def get_input_from_excel():
+    file_path = input("Enter the path to your Excel file: ")
+    try:
+        df_criteria_comparison = pd.read_excel(file_path, sheet_name='Criteria Comparison', index_col=0)
+        df_robots = pd.read_excel(file_path, sheet_name='Robots')
+        df_tasks = pd.read_excel(file_path, sheet_name='Tasks', index_col=0)
+        
+        criteria_comparison_matrix = df_criteria_comparison.values
+        num_criteria = criteria_comparison_matrix.shape[0]
+        criteria = df_criteria_comparison.columns
+        
+        robots = []
+        for index, row in df_robots.iterrows():
+            robots.append({'ID': row['ID'], 'Type': row['Type'], 'Values': row.iloc[2:].values.astype(float)})
+        
+        tasks = []
+        for index, row in df_tasks.iterrows():
+            tasks.append({'Type': index, 'Scores': row.values.astype(float)})
+        
+        return num_criteria, criteria, robots, tasks, criteria_comparison_matrix
+    
+    except Exception as e:
+        print("Error reading Excel file:", str(e))
+        return None
+
+def get_input_manually():
+    # Your existing manual input code here
+    num_criteria = 6
+    criteria = ['Navigation Efficiency', 'Payload Capacity', 'Safety', 'Communication Effectiveness', 'Adaptability', 'Energy Efficiency']
+    
+    criteria_comparison_matrix = np.zeros((num_criteria, num_criteria))
+    for i in range(num_criteria):
+        for j in range(i+1, num_criteria):
+            while True:
+                comparison = input(f"Enter pairwise comparison between {criteria[i]} and {criteria[j]} (e.g., 3 or 1/3): ")
+                try:
+                    if '/' in comparison:
+                        numerator, denominator = map(float, comparison.split('/'))
+                        comparison_value = numerator / denominator
+                    else:
+                        comparison_value = float(comparison)
+                    criteria_comparison_matrix[i, j] = np.round(comparison_value, 4)
+                    criteria_comparison_matrix[j, i] = np.round(1 / comparison_value, 4)
+                    break
+                except ValueError:
+                    print("Invalid input. Please enter a number or a fraction (e.g., 3 or 1/3).")
+    for i in range(num_criteria):
+        criteria_comparison_matrix[i, i] = 1
+    
+    num_robots = int(input("Enter the number of robots: "))
+    robots = []
+    robot_types = ['Drone', 'Ground Robot', 'Creeper Robot']
+    drone_id = 1
+    ground_robot_id = 1
+    creeper_robot_id = 1
+    for i in range(num_robots):
+        robot_type = input(f"Enter the type of robot {i+1} (Drone, Ground Robot, Creeper Robot): ")
+        while robot_type not in robot_types:
+            print("Invalid robot type. Please enter one of the following: Drone, Ground Robot, Creeper Robot")
+            robot_type = input(f"Enter the type of robot {i+1} (Drone, Ground Robot, Creeper Robot): ")
+        values = input(f"Enter the values for {robot_type} {i+1} (6 values separated by spaces): ")
+        values = [np.round(float(x), 4) for x in values.split()]
+        if robot_type == 'Drone':
+            robot_id = f"D{drone_id}"
+            drone_id += 1
+        elif robot_type == 'Ground Robot':
+            robot_id = f"G{ground_robot_id}"
+            ground_robot_id += 1
+        else:
+            robot_id = f"C{creeper_robot_id}"
+            creeper_robot_id += 1
+        robots.append({'ID': robot_id, 'Type': robot_type, 'Values': values})
+    
+    num_tasks = int(input("Enter the number of tasks: "))
+    task_types = ['Scan and Rescue', 'Supply Necessities', 'Lifting Remains']
+    tasks = []
+    for i in range(num_tasks):
+        task_type = input(f"Enter the type of task {i+1} (Scan and Rescue, Supply Necessities, Lifting Remains): ")
+        while task_type not in task_types:
+            print("Invalid task type. Please enter one of the following: Scan and Rescue, Supply Necessities, Lifting Remains")
+            task_type = input(f"Enter the type of task {i+1} (Scan and Rescue, Supply Necessities, Lifting Remains): ")
+        scores = input(f"Enter scores for Task {i+1} (6 values separated by spaces on a scale of 1-9): ")
+        scores = [np.round(float(x), 4) for x in scores.split()]
+        tasks.append({'Type': task_type, 'Scores': scores})
+    
+    return num_criteria, criteria, robots, tasks, criteria_comparison_matrix
+
+def main():
+    print("Select input method:")
+    print("1. Manual input")
+    print("2. Load from Excel file")
+    choice = input("Enter your choice (1/2): ")
+    
+    if choice == '1':
+        num_criteria, criteria, robots, tasks, criteria_comparison_matrix = get_input_manually()
+    elif choice == '2':
+        result = get_input_from_excel()
+        if result:
+            num_criteria, criteria, robots, tasks, criteria_comparison_matrix = result
+        else:
+            print("Failed to load data from Excel file.")
+            return
+    else:
+        print("Invalid choice.")
+        return
+    
+    # Calculate the weights of the criteria using AHP
+    eigenvalues, eigenvectors = np.linalg.eig(criteria_comparison_matrix)
+    max_eigenvalue_index = np.argmax(eigenvalues)
+    criteria_weights = np.abs(eigenvectors[:, max_eigenvalue_index])
+    criteria_weights = criteria_weights / np.sum(criteria_weights)
+    
+    task_priorities = {}
+    for task in tasks:
+        priority = np.sum(np.array(task['Scores']) * criteria_weights)
+        task_priorities[task['Type']] = priority
+    
+    sorted_tasks = sorted(task_priorities.items(), key=lambda x: x[1], reverse=True)
+    
+    print("\nTask Priorities:")
+    for task, priority in sorted_tasks:
+        print(f"{task}: {priority}")
+    
+    decision_matrix = np.array([robot['Values'] for robot in robots])
+    normalized_decision_matrix = decision_matrix / np.max(decision_matrix, axis=0)
+    weighted_normalized_decision_matrix = normalized_decision_matrix * criteria_weights
+    
+    ideal_best = np.max(weighted_normalized_decision_matrix, axis=0)
+    ideal_worst = np.min(weighted_normalized_decision_matrix, axis=0)
+    
+    distance_best = np.sqrt(np.sum((weighted_normalized_decision_matrix - ideal_best) ** 2, axis=1))
+    distance_worst = np.sqrt(np.sum((weighted_normalized_decision_matrix - ideal_worst) ** 2, axis=1))
+    
+    S = distance_best
+    R = np.max(np.abs(weighted_normalized_decision_matrix - ideal_best), axis=1)
+    S_best = np.min(S)
+    S_worst = np.max(S)
+    R_best = np.min(R)
+    R_worst = np.max(R)
+    v = 0.5  
+    Q = v * (S - S_best) / (S_worst - S_best) + (1-v) * (R - R_best) / (R_worst - R_best)
+    
+    robot_rankings = np.argsort(Q)
+    
+    print("\nRobot Rankings:")
+    for i, ranking in enumerate(robot_rankings):
+        print(f"Rank {i+1}: {robots[ranking]['ID']} ({robots[ranking]['Type']})")
+    
+    available_robots = robots[:]
+    for task_type, task_priority in sorted_tasks:
+        print(f"\n{task_type} Priority: {task_priority}")
+        if task_type == 'Scan and Rescue':
+            required_robots = [robot for robot in available_robots if robot['Type'] in ['Drone', 'Ground Robot']]
+            if len(required_robots) < 2:
+                print("Not enough robots available for Scan and Rescue task.")
+                continue
+            required_robots.sort(key=lambda x: np.sum(np.array(x['Values']) * criteria_weights), reverse=True)
+            print(f"Team for {task_type}:")
+            team = [required_robots[0], required_robots[1]]
+            for robot in team:
+                print(f"{robot['ID']} ({robot['Type']})")
+                available_robots.remove(robot)
+        elif task_type == 'Supply Necessities':
+            required_robots = [robot for robot in available_robots if robot['Type'] in ['Ground Robot', 'Creeper Robot', 'Drone']]
+            if not required_robots:
+                print("No robots available for Supply Necessities task.")
+                continue
+            required_robots.sort(key=lambda x: np.sum(np.array(x['Values']) * criteria_weights), reverse=True)
+            print(f"Team for {task_type}:")
+            team = [required_robots[0]]
+            for robot in team:
+                print(f"{robot['ID']} ({robot['Type']})")
+                available_robots.remove(robot)
+        elif task_type == 'Lifting Remains':
+            required_robots = [robot for robot in available_robots if robot['Type'] == 'Ground Robot']
+            if len(required_robots) < 2:
+              print("Not enough Ground Robots available for Lifting Remains task")
+              tasks.append({'Type': task_type, 'Scores': scores})
+    
+    return num_criteria, criteria, robots, tasks, criteria_comparison_matrix
+
+def main():
+    print("Select input method:")
+    print("1. Manual input")
+    print("2. Load from Excel file")
+    choice = input("Enter your choice (1/2): ")
+    
+    if choice == '1':
+        num_criteria, criteria, robots, tasks, criteria_comparison_matrix = get_input_manually()
+    elif choice == '2':
+        result = get_input_from_excel()
+        if result:
+            num_criteria, criteria, robots, tasks, criteria_comparison_matrix = result
+        else:
+            print("Failed to load data from Excel file.")
+            return
+    else:
+        print("Invalid choice.")
+        return
+    
+    # Calculate the weights of the criteria using AHP
+    eigenvalues, eigenvectors = np.linalg.eig(criteria_comparison_matrix)
+    max_eigenvalue_index = np.argmax(eigenvalues)
+    criteria_weights = np.abs(eigenvectors[:, max_eigenvalue_index])
+    criteria_weights = criteria_weights / np.sum(criteria_weights)
+    
+    task_priorities = {}
+    for task in tasks:
+        priority = np.dot(task['Scores'], criteria_weights)
+        task_priorities[task['Type']] = priority
+    
+    sorted_tasks = sorted(task_priorities.items(), key=lambda x: x[1], reverse=True)
+    print("\nTask Priorities:")
+    for task, priority in sorted_tasks:
+        print(f"{task}: {priority:.4f}")
+    
+    # Rest of your existing code here...
+    available_robots = robots[:]
+    for task_type, task_priority in sorted_tasks:
+        print(f"\n{task_type} Priority: {task_priority:.4f}")
+        if task_type == 'Scan and Rescue':
+            required_robots = [robot for robot in available_robots if robot['Type'] in ['Drone', 'Ground Robot']]
+            if len(required_robots) < 2:
+                print("Not enough robots available for Scan and Rescue task.")
+                continue
+            required_robots.sort(key=lambda x: np.dot(x['Values'], criteria_weights), reverse=True)
+            print(f"Team for {task_type}:")
+            team = [required_robots[0], required_robots[1]]
+            for robot in team:
+                print(f"{robot['ID']} ({robot['Type']})")
+                available_robots.remove(robot)
+        elif task_type == 'Supply Necessities':
+            required_robots = [robot for robot in available_robots if robot['Type'] in ['Ground Robot', 'Creeper Robot', 'Drone']]
+            if not required_robots:
+                print("No robots available for Supply Necessities task.")
+                continue
+            required_robots.sort(key=lambda x: np.dot(x['Values'], criteria_weights), reverse=True)
+            print(f"Team for {task_type}:")
+            team = [required_robots[0]]
+            for robot in team:
+                print(f"{robot['ID']} ({robot['Type']})")
+                available_robots.remove(robot)
+        elif task_type == 'Lifting Remains':
+            required_robots = [robot for robot in available_robots if robot['Type'] == 'Ground Robot']
+            if len(required_robots) < 2:
+                print("Not enough Ground Robots available for Lifting Remains task.")
+                continue
+            required_robots.sort(key=lambda x: np.dot(x['Values'], criteria_weights), reverse=True)
+            print(f"Team for {task_type}:")
+            team = [required_robots[0], required_robots[1]]
+            for robot in team:
+                print(f"{robot['ID']} ({robot['Type']})")
+                available_robots.remove(robot)
+
+if __name__ == "__main__":
+    main()
+
