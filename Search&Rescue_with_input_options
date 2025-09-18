@@ -27,7 +27,7 @@ def get_input_from_excel():
         return None
 
 def get_input_manually():
-    # Your existing manual input code here
+    
     num_criteria = 6
     criteria = ['Navigation Efficiency', 'Payload Capacity', 'Safety', 'Communication Effectiveness', 'Adaptability', 'Energy Efficiency']
     
