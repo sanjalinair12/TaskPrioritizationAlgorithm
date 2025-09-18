@@ -120,22 +120,32 @@ def main():
     distance_best = np.sqrt(np.sum((weighted_decision_matrix - ideal_best) ** 2, axis=1))
     distance_worst = np.sqrt(np.sum((weighted_decision_matrix - ideal_worst) ** 2, axis=1))
     closeness_coefficient = distance_worst / (distance_best + distance_worst)
-    
-    # VIKOR for robot ranking
-    S = distance_best
-    R = np.max(np.abs(weighted_decision_matrix - ideal_best), axis=1)
-    S_best = np.min(S)
-    S_worst = np.max(S)
-    R_best = np.min(R)
-    R_worst = np.max(R)
-    v = 0.5  
-    Q = v * (S - S_best) / (S_worst - S_best) + (1-v) * (R - R_best) / (R_worst - R_best)
+
+    # VIKOR Index Calculation using the ideal distance from TOPSIS
+    D_plus = np.sqrt(np.sum((weighted_decision_matrix - ideal_best) ** 2, axis=1))
+    D_minus = np.sqrt(np.sum((weighted_decision_matrix - ideal_worst) ** 2, axis=1))
+
+    D_plus_best = np.min(D_plus)
+    D_plus_worst = np.max(D_plus)
+    D_minus_best = np.min(D_minus)
+    D_minus_worst = np.max(D_minus)
+
+    v = 0.5
+
+    if (D_plus_worst - D_plus_best) == 0 or (D_minus_worst - D_minus_best) == 0:
+      Q = D_plus
+    else:
+      Q = v * ((D_plus - D_plus_best) / (D_plus_worst - D_plus_best)) + (1-v) * ((D_minus_worst - D_minus) / (D_minus_worst - D_minus_best))
+
     robot_rankings = np.argsort(Q)
-    
+
     print("\nRobot Rankings:")
     for i, ranking in enumerate(robot_rankings):
-        print(f"Rank {i+1}: {robots[ranking]['ID']} ({robots[ranking]['Type']})")
+      print(f"Rank {i+1}: {robots[ranking]['ID']} ({robots[ranking]['Type']})")
+
+    # Assign tasks to robots
     
+
     available_robots = robots[:]
     for task_type, task_priority in sorted_tasks:
         print(f"\n{task_type} Priority: {task_priority:.4f}")
