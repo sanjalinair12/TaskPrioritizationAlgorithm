@@ -96,12 +96,13 @@ def main():
         print("Invalid choice.")
         return
     
-    # Calculate the weights of the criteria using AHP
+    # Calculate the weights of the criteria using AHP, the pairwise-comparison matrix and normalization
     eigenvalues, eigenvectors = np.linalg.eig(criteria_comparison_matrix)
     max_eigenvalue_index = np.argmax(eigenvalues)
     criteria_weights = np.abs(eigenvectors[:, max_eigenvalue_index])
     criteria_weights = criteria_weights / np.sum(criteria_weights)
-    
+
+    # Task Priority Calculation
     task_priorities = {}
     for task in tasks:
         priority = np.dot(task['Scores'], criteria_weights)
@@ -112,7 +113,7 @@ def main():
     for task, priority in sorted_tasks:
         print(f"{task}: {priority:.4f}")
     
-    # TOPSIS for robot performance evaluation
+    # TOPSIS for robot performance evaluation - Decision Matrix Creation and analysis
     decision_matrix = np.array([robot['Values'] for robot in robots])
     weighted_decision_matrix = decision_matrix * criteria_weights
     ideal_best = np.max(weighted_decision_matrix, axis=0)
@@ -139,49 +140,61 @@ def main():
 
     robot_rankings = np.argsort(Q)
 
-    print("\nRobot Rankings:")
-    for i, ranking in enumerate(robot_rankings):
-      print(f"Rank {i+1}: {robots[ranking]['ID']} ({robots[ranking]['Type']})")
+    # Rank robots by type for feasible assignment
+    ground_robots = sorted([robot for robot in robots if robot['Type'] == 'Ground Robot'], key=lambda x: Q[robots.index(x)])
+    drone_robots = sorted([robot for robot in robots if robot['Type'] == 'Drone'], key=lambda x: Q[robots.index(x)])
+    creeper_robots = sorted([robot for robot in robots if robot['Type'] == 'Creeper Robot'], key=lambda x: Q[robots.index(x)])
 
-    # Assign tasks to robots
-    
+    sorted_tasks.sort(key=lambda x: x[1], reverse=True)
 
-    available_robots = robots[:]
+    def get_robot_score(robot, weights):
+        return np.dot(robot['Values'], weights)
+
     for task_type, task_priority in sorted_tasks:
         print(f"\n{task_type} Priority: {task_priority:.4f}")
+        assigned_robots = []
+
+      # Calculate the importance of each criterion within the task for assigning the robots correctly, thus each robot after assignment will be removed from the list.
+        task = next(t for t in tasks if t['Type'] == task_type)
+
+        
+        weights = task['Scores'] / np.sum(task['Scores'])
+
         if task_type == 'Scan and Rescue':
-            required_robots = [robot for robot in available_robots if robot['Type'] in ['Drone', 'Ground Robot']]
-            if len(required_robots) < 2:
-                print("Not enough robots available for Scan and Rescue task.")
-                continue
-            required_robots.sort(key=lambda x: closeness_coefficient[robots.index(x)], reverse=True)
-            print(f"Team for {task_type}:")
-            team = [required_robots[0], required_robots[1]]
-            for robot in team:
-                print(f"{robot['ID']} ({robot['Type']})")
-                available_robots.remove(robot)
-        elif task_type == 'Supply Necessities':
-            required_robots = [robot for robot in available_robots if robot['Type'] in ['Ground Robot', 'Creeper Robot', 'Drone']]
-            if not required_robots:
-                print("No robots available for Supply Necessities task.")
-                continue
-            required_robots.sort(key=lambda x: closeness_coefficient[robots.index(x)], reverse=True)
-            print(f"Team for {task_type}:")
-            team = [required_robots[0]]
-            for robot in team:
-                print(f"{robot['ID']} ({robot['Type']})")
-                available_robots.remove(robot)
+            if drone_robots:
+                best_drone = max(drone_robots, key=lambda r: get_robot_score(r, weights))
+                assigned_robots.append(best_drone)
+                drone_robots.remove(best_drone)
+            for _ in range(2):
+                if ground_robots:
+                    best_ground = max(ground_robots, key=lambda r: get_robot_score(r, weights))
+                    assigned_robots.append(best_ground)
+                    ground_robots.remove(best_ground)
+
         elif task_type == 'Lifting Remains':
-            required_robots = [robot for robot in available_robots if robot['Type'] == 'Ground Robot']
-            if len(required_robots) < 2:
-                print("Not enough Ground Robots available for Lifting Remains task.")
-                continue
-                required_robots.sort(key=lambda x: closeness_coefficient[robots.index(x)], reverse=True)
+            for _ in range(2):
+                if ground_robots:
+                    best_ground = max(ground_robots, key=lambda r: get_robot_score(r, weights))
+                    assigned_robots.append(best_ground)
+                    ground_robots.remove(best_ground)
+
+        elif task_type == 'Supply Necessities':
+            if ground_robots:
+                best_ground = max(ground_robots, key=lambda r: get_robot_score(r, weights))
+                assigned_robots.append(best_ground)
+                ground_robots.remove(best_ground)
+            if creeper_robots:
+                best_creeper = max(creeper_robots, key=lambda r: get_robot_score(r, weights))
+                assigned_robots.append(best_creeper)
+                creeper_robots.remove(best_creeper)
+
+        if assigned_robots:
             print(f"Team for {task_type}:")
-            team = [required_robots[0], required_robots[1]]
-            for robot in team:
+            for robot in assigned_robots:
                 print(f"{robot['ID']} ({robot['Type']})")
-                available_robots.remove(robot)
+        else:
+            print(f"No robots assigned to {task_type}.")
+
 
 if __name__ == "__main__":
     main()
