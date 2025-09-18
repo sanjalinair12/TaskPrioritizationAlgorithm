@@ -217,7 +217,7 @@ def main():
     for task, priority in sorted_tasks:
         print(f"{task}: {priority:.4f}")
     
-    # Rest of your existing code here...
+   
     available_robots = robots[:]
     for task_type, task_priority in sorted_tasks:
         print(f"\n{task_type} Priority: {task_priority:.4f}")
