@@ -60,7 +60,7 @@ We intend to prove the theorem in three steps:
 
 ### Step A — Normalisation Property
 
-\(D^+\) and \(D^-\) are Euclidean distances in normalised space.
+D_i^+ and D_i^- are Euclidean distances in normalised space.
 
 By definition:
 
