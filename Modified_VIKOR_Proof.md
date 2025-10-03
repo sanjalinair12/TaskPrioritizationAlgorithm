@@ -43,12 +43,12 @@ Where:
 
 # Theorem
 
-**Theorem:**  
+ 
 Using ideal distances from TOPSIS (\(D^+, D^-\)) as \(S\) and \(R\) in the VIKOR index improves:
 
 - Ranking consistency  
 - Robustness to noise  
-- Closeness to ideal solution  
+- Closeness to the ideal solution  
 
 compared to the standard VIKOR method.
 
@@ -56,11 +56,11 @@ compared to the standard VIKOR method.
 
 ## 3. Proof Plan
 
-We prove the theorem in three steps:
+We intend to prove the theorem in three steps:
 
 ### Step A — Normalisation Property
 
-\(D^+\) and \(D^-\) are Euclidean distances in normalised space.  
+\(D^+\) and \(D^-\) are Euclidean distances in normalised space.
 
 By definition:
 
