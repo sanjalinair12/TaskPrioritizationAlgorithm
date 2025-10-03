@@ -32,5 +32,13 @@ w_j
 }
 $$
 
+Where:
+
+$$\text{Where:}$$
+
+* $$v_{ij} = \text{normalised value of criterion } j \text{ for alternative } i$$
+* $$v_j^+ = \text{ideal (best) value for criterion } j$$
+* $$v_j^- = \text{negative ideal (worst) value for criterion } j$$
+* $$w_j = \text{criterion weight}$$
 
 
