@@ -44,7 +44,7 @@ Where:
 # Theorem
 
  
-Using ideal distances from TOPSIS (\(D^+, D^-\)) as \(S\) and \(R\) in the VIKOR index improves:
+Using ideal distances from TOPSIS $$Di^+, Di-$$ as \(S\) and \(R\) in the VIKOR index improves:
 
 - Ranking consistency  
 - Robustness to noise  
@@ -60,7 +60,7 @@ We intend to prove the theorem in three steps:
 
 ### Step A — Normalisation Property
 
-D_i^+ and D_i^- are Euclidean distances in normalised space.
+$$D_i^+$$ and $$D_i^- $$are Euclidean distances in normalised space.
 
 By definition:
 
