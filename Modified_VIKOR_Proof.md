@@ -60,12 +60,12 @@ We intend to prove the theorem in three steps:
 
 ### Step A — Normalisation Property
 
-$$D_i^+$$ and $$D_i^- $$are Euclidean distances in normalised space.
+$$D_i^+$$ and $$D_i^- $$ are Euclidean distances in normalised space.
 
 By definition:
 
 \[
-0 \le D_i^+, D_i^- \le 1.
+0 \le $$ D_i^+, D_i^- $$ \le 1.
 \]
 
 This ensures uniform normalisation across criteria.
