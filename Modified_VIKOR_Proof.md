@@ -94,7 +94,7 @@ Here, we adopt the standard convention to avoid an undefined expression,
 $$\frac{D_i^+}{D_i^+ + D_i^-} = 0 \quad \text{when} \quad D_i^+ = D_i^- = 0.$$ 
 So here Q_i = 0, which lies in [0,1]
 
-From this, we can conclude that 0≤Q_i≤1 in all circumstances
+From this, we can conclude that 0≤Q_i≤1 in all circumstances.
 
 
 
