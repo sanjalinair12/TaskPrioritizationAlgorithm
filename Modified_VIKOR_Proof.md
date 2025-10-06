@@ -89,6 +89,14 @@ $$0 \\le\\frac{D_i^+}{D_i^+ + D_i^-} \\le1,$$
 
 so  $$0 \\le\ Q_i \\le 1$$ in this case.
 
+Considering the case $D_i^+ + D_i^- =0$, this equality can only hold if $D_i^+$ and $D_i^-$ simultaneously become zero. This is a degenerate situation where the alternative coincides with both ideals.
+Here, we adopt the standard convention to avoid an undefined expression,
+$$\frac{D_i^+}{D_i^+ + D_i^-} = 0 \quad \text{when} \quad D_i^+ = D_i^- = 0.$$ 
+So here Q_i = 0, which lies in [0,1]
+
+From this, we can conclude that 0≤Q_i≤1 in all circumstances
+
+
 
 ---
 
