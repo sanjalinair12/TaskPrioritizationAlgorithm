@@ -74,57 +74,58 @@ $$Q_i = (v + (1 - v)) \cdot \frac{D_i^+}{D_i^+ + D_i^-} = \frac{D_i^+}{D_i^+ + D
 
 v+(1−v)=1, so the convex weights do not change the value when applied to identical inner terms.
 
-By the definition of the TOPSIS ideal distances,  
-\( D_i^+ \ge 0 \) and \( D_i^- \ge 0 \),  
-therefore the denominator  
-\( D_i^+ + D_i^- \ge 0 \).  
+By the definition of the TOPSIS ideal distances,
+$(D_{i}^{+} \ge 0)$ and $(D_{i}^{-} \ge 0)$,
+therefore the denominator
+$(D_{i}^{+} + D_{i}^{-}) \ge 0$.
 
-As the Euclidean distances are non-negative quantities,  
-the numerator is also non-negative.  
+As the Euclidean distances are non-negative quantities,
+the numerator is also non-negative.
 Thus, we can prove the non-negativity of the denominator in all conditions.
 
-Now, let us consider two cases where  
-\( D_i^+ + D_i^- > 0 \) and \( D_i^+ + D_i^- = 0 \).  
+Now, let us consider two cases where
+$(D_{i}^{+} + D_{i}^{-}) > 0$ and $(D_{i}^{+} + D_{i}^{-}) = 0$.
 
-For \( D_i^+ + D_i^- > 0 \),  
+For $(D_{i}^{+} + D_{i}^{-}) > 0$,
 using the basic inequality for fractions, we have:
 
-\[
-0 \le \frac{D_i^+}{D_i^+ + D_i^-} \le 1.
-\]
+$$
+0 \le \frac{D_{i}^{-}}{D_{i}^{+} + D_{i}^{-}} \le 1
+$$
 
-Dividing all parts of the inequality by the positive number \( D_i^+ + D_i^- \) gives:
+Dividing all parts of the inequality by the positive number $(D_{i}^{+} + D_{i}^{-})$ gives:
 
-\[
-0 \le \frac{D_i^+}{D_i^+ + D_i^-} \le 1.
-\]
+$$
+0 \le \frac{D_{i}^{-}}{D_{i}^{+} + D_{i}^{-}} \le 1
+$$
 
 Thus:
 
-\[
+$$
 0 \le Q_i \le 1
-\]
+$$
 
 in this case.
 
-For the case \( D_i^+ + D_i^- = 0 \),  
-this equality can only hold if \( D_i^+ = D_i^- = 0 \) simultaneously.  
-This is a degenerate situation where the alternative coincides with both ideal and anti-ideal solutions.  
+For the case $(D_{i}^{+} + D_{i}^{-}) = 0$,
+this equality can only hold if $(D_{i}^{+} = 0 \text{ and } D_{i}^{-} = 0)$ simultaneously.
+This is a degenerate situation where the alternative coincides with both ideal and anti-ideal solutions.
 
 By convention, to avoid undefined expressions:
 
-\[
-\frac{D_i^+}{D_i^+ + D_i^-} := 0 \quad \text{when} \quad D_i^+ = D_i^- = 0.
-\]
+$$
+\frac{D_{i}^{-}}{D_{i}^{+} + D_{i}^{-}} = 0 \quad \text{when} \quad D_{i}^{+} = D_{i}^{-} = 0.
+$$
 
-So here \( Q_i = 0 \),  
-which lies in \([0,1]\).
+So here $(Q_i = 0)$,
+which lies in $[0, 1]$.
+
 
 From this, we can conclude that:
 
-\[
+$$
 0 \le Q_i \le 1
-\]
+$$
 
 in all circumstances.
 
