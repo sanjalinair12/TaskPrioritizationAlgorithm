@@ -79,15 +79,13 @@ $(D_{i}^{+} \ge 0)$ and $(D_{i}^{-} \ge 0)$,
 therefore the denominator
 $(D_{i}^{+} + D_{i}^{-}) \ge 0$.
 
-As the Euclidean distances are non-negative quantities,
-the numerator is also non-negative.
+As the Euclidean distances are non-negative quantities, the numerator is also non-negative.
 Thus, we can prove the non-negativity of the denominator in all conditions.
 
 Now, let us consider two cases where
 $(D_{i}^{+} + D_{i}^{-}) > 0$ and $(D_{i}^{+} + D_{i}^{-}) = 0$.
 
-For $(D_{i}^{+} + D_{i}^{-}) > 0$,
-using the basic inequality for fractions, we have:
+For $(D_{i}^{+} + D_{i}^{-}) > 0$, using the basic inequality for fractions, we have:
 
 $$
 0 \le \frac{D_{i}^{-}}{D_{i}^{+} + D_{i}^{-}} \le 1
@@ -103,9 +101,7 @@ Thus:
 
 $$
 0 \le Q_i \le 1
-$$
-
-in this case.
+$$  in this case.
 
 For the case $(D_{i}^{+} + D_{i}^{-}) = 0$,
 this equality can only hold if $(D_{i}^{+} = 0 \text{ and } D_{i}^{-} = 0)$ simultaneously.
@@ -123,11 +119,7 @@ which lies in $[0, 1]$.
 
 From this, we can conclude that:
 
-$$
-0 \le Q_i \le 1
-$$
-
-in all circumstances.
+$$0 \le Q_i \le 1$$    in all circumstances.
 
 
 
