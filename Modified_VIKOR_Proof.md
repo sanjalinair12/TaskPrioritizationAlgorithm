@@ -74,27 +74,60 @@ $$Q_i = (v + (1 - v)) \cdot \frac{D_i^+}{D_i^+ + D_i^-} = \frac{D_i^+}{D_i^+ + D
 
 v+(1−v)=1, so the convex weights do not change the value when applied to identical inner terms.
 
-By the definition of the TOPSIS ideal distances, 
-$D_i^+$ ≥ 0 and  $D_i^- ​≥0$, therefore the denominator  $D_i^+ + D_i^- ​≥0$.
-As the Euclidean distances are non-negative by definition, we can say that both the denominator and numerator are non-negative quantities.
-Thus, we could prove the non-negativity of the denominator in all conditions.
+By the definition of the TOPSIS ideal distances,  
+\( D_i^+ \ge 0 \) and \( D_i^- \ge 0 \),  
+therefore the denominator  
+\( D_i^+ + D_i^- \ge 0 \).  
 
-Now, let us consider two cases where $D_i^+ + D_i^-​>0$ and $D_i^+ + D_i^- =0$
-For $D_i^+ + D_i^-​>0$, using the basic inequality used to show any fraction of the form numerator/(numerator+nonnegative remainder) lies between 0 and 1, we can say that
-$$0 \\le\ D_i^+ \\le\ D_i^+ + D_i^-.$$
+As the Euclidean distances are non-negative quantities,  
+the numerator is also non-negative.  
+Thus, we can prove the non-negativity of the denominator in all conditions.
 
-Dividing all parts of the inequality by the positive number \(D_i^+ + D_i^-\) gives
+Now, let us consider two cases where  
+\( D_i^+ + D_i^- > 0 \) and \( D_i^+ + D_i^- = 0 \).  
 
-$$0 \\le\\frac{D_i^+}{D_i^+ + D_i^-} \\le1,$$
+For \( D_i^+ + D_i^- > 0 \),  
+using the basic inequality for fractions, we have:
 
-so  $$0 \\le\ Q_i \\le 1$$ in this case.
+\[
+0 \le \frac{D_i^+}{D_i^+ + D_i^-} \le 1.
+\]
 
-Considering the case $D_i^+ + D_i^- =0$, this equality can only hold if $D_i^+$ and $D_i^-$ simultaneously become zero. This is a degenerate situation where the alternative coincides with both ideals.
-Here, we adopt the standard convention to avoid an undefined expression,
-$$\frac{D_i^+}{D_i^+ + D_i^-} = 0 \quad \text{when} \quad D_i^+ = D_i^- = 0.$$ 
-So here Q_i = 0, which lies in [0,1]
+Dividing all parts of the inequality by the positive number \( D_i^+ + D_i^- \) gives:
 
-From this, we can conclude that 0≤Q_i≤1 in all circumstances.
+\[
+0 \le \frac{D_i^+}{D_i^+ + D_i^-} \le 1.
+\]
+
+Thus:
+
+\[
+0 \le Q_i \le 1
+\]
+
+in this case.
+
+For the case \( D_i^+ + D_i^- = 0 \),  
+this equality can only hold if \( D_i^+ = D_i^- = 0 \) simultaneously.  
+This is a degenerate situation where the alternative coincides with both ideal and anti-ideal solutions.  
+
+By convention, to avoid undefined expressions:
+
+\[
+\frac{D_i^+}{D_i^+ + D_i^-} := 0 \quad \text{when} \quad D_i^+ = D_i^- = 0.
+\]
+
+So here \( Q_i = 0 \),  
+which lies in \([0,1]\).
+
+From this, we can conclude that:
+
+\[
+0 \le Q_i \le 1
+\]
+
+in all circumstances.
+
 
 
 
