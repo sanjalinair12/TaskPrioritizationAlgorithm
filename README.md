@@ -4,13 +4,13 @@
 ## Overview
 ------------
 
-This project implements a robot task assignment system using the Analytic Hierarchy Process (AHP), TOPSIS and VIKOR method. The system takes into account multiple criteria and task types to assign robots to tasks.
+This project implements a robot task assignment system using the Analytic Hierarchy Process (AHP), TOPSIS and VIKOR method. The system considers multiple criteria and task types to assign robots to tasks.
 
 ## Features
 ------------
 
 *   AHP-based weight calculation for criteria
-*   TOPSIS based robot capability evaluation
+*   TOPSIS-based robot capability evaluation
 *   VIKOR method for robot ranking
 *   Task prioritization  and team formation based on criteria weights
 *   Robot assignment to tasks based on rankings and task requirements.
@@ -24,7 +24,7 @@ This project implements a robot task assignment system using the Analytic Hierar
 ## Installation
 ------------
 
-1.  Clone the repository: `git clone https://github.com/sanjalinair12/Task_Prioritization_Algorithm.git`
+1.  Clone this repository using the git clone command
 2.  Install the required libraries: `pip install numpy`
    
    ## Usage
