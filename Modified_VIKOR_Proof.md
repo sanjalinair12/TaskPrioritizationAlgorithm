@@ -59,6 +59,7 @@ compared to the standard VIKOR method.
 Let $D_i^+$ ≥ 0 and  $D_i^- ​≥0$ be the Euclidean distances of alternative 𝑖  to the positive and negative ideal solutions, respectively. 
 
 Define 
+
 $$Q_i = v \cdot \frac{D_i^+}{D_i^+ + D_i^-} + (1 - v) \cdot \frac{D_i^+}{D_i^+ + D_i^-}, \qquad v \in [0,1].$$
 
 Then for every alternative 𝑖,
@@ -67,7 +68,7 @@ $$
 0 \le Q_i \le 1.
 $$
 
-As both summands are the same, we can modify the above equation for $Q_i$ as follows:
+As both denominators are the same, we can modify the above equation for $Q_i$ as follows:
 
 $$Q_i = (v + (1 - v)) \cdot \frac{D_i^+}{D_i^+ + D_i^-} = \frac{D_i^+}{D_i^+ + D_i^-}.$$
 
@@ -79,6 +80,15 @@ As the Euclidean distances are non-negative by definition, we can say that both 
 Thus, we could prove the non-negativity of the denominator in all conditions.
 
 Now, let us consider two cases where $D_i^+ + D_i^-​>0$ and $D_i^+ + D_i^- =0$
+For $D_i^+ + D_i^-​>0$, using the basic inequality used to show any fraction of the form numerator/(numerator+nonnegative remainder) lies between 0 and 1, we can say that
+$$0 \\le\ D_i^+ \\le\ D_i^+ + D_i^-.$$
+
+Dividing all parts of the inequality by the positive number \(D_i^+ + D_i^-\) gives
+
+$$0 \\le\\frac{D_i^+}{D_i^+ + D_i^-} \\le1,$$
+
+so  $$0 \\le\ Q_i \\le 1$$ in this case.
+
 
 ---
 
