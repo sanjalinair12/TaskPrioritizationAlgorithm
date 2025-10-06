@@ -53,34 +53,32 @@ compared to the standard VIKOR method.
 
 ## 3. Proof
 
-We intend to prove the theorem in three steps:
 
 ### Step A — Normalisation Property
 
-$D_i^+$ and $D_i^-$ are Euclidean distances in normalised space.
+Let $D_i^+$ ≥ 0 and  $D_i^- ​≥0$ be the Euclidean distances of alternative 𝑖  to the positive and negative ideal solutions, respectively. 
 
-By definition:
+Define 
+$$Q_i = v \cdot \frac{D_i^+}{D_i^+ + D_i^-} + (1 - v) \cdot \frac{D_i^+}{D_i^+ + D_i^-}, \qquad v \in [0,1].$$
 
-$$
-0 \le D_i^+, D_i^- \le 1.
-$$
-
-This ensures uniform normalisation across criteria.
-
-**Proof:**
-Given normalised $v_{ij} \in [0,1]$:
+Then for every alternative 𝑖,
 
 $$
-(v_{ij} - v_j^+)^2 \le 1,
+0 \le Q_i \le 1.
 $$
 
-therefore:
+As both summands are the same, we can modify the above equation for $Q_i$ as follows:
 
-$$
-D_i^+ = \sum_{j} w_j \left( v_{ij} - v_j^+ \right)^2 \le \sum_{j} w_j = 1, \quad (\text{if } \sum_{j} w_j = 1).
-$$
+$$Q_i = (v + (1 - v)) \cdot \frac{D_i^+}{D_i^+ + D_i^-} = \frac{D_i^+}{D_i^+ + D_i^-}.$$
 
-Similarly for $D_i^- $.
+v+(1−v)=1, so the convex weights do not change the value when applied to identical inner terms.
+
+By the definition of the TOPSIS ideal distances, 
+$D_i^+$ ≥ 0 and  $D_i^- ​≥0$, therefore the denominator  $D_i^+ + D_i^- ​≥0$.
+As the Euclidean distances are non-negative by definition, we can say that both the denominator and numerator are non-negative quantities.
+Thus, we could prove the non-negativity of the denominator in all conditions.
+
+Now, let us consider two cases where $D_i^+ + D_i^-​>0$ and $D_i^+ + D_i^- =0$
 
 ---
 
