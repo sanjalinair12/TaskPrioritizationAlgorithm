@@ -1,5 +1,5 @@
 This section provides the mathematical proof for the modified VIKOR methodology of Multi-Criteria Decision-Making.
-In the paper, instead of using the standard VIKOR equations for calculating the VIKOR index, we have modified the S and R values with the Di+ and Di- values calculated in the TOPSIS phase.
+In the paper, instead of using the standard VIKOR equations for calculating the VIKOR index, we have modified the S and R values with the $D_i^+$ and $D_i^-$ values calculated in the TOPSIS phase.
 
 
 **Standard VIKOR:**
@@ -39,7 +39,7 @@ Where:
 * $$v_j^- = \text{negative ideal (worst) value for criterion } j$$ (NIS)
 * $$w_j = \text{criterion weight}$$
 
-# Theorem
+
 
 Using ideal distances from TOPSIS $D_i^+$ and $D_i^-$ as $S$ and $R$ in the VIKOR index improves:
 
@@ -50,139 +50,22 @@ Using ideal distances from TOPSIS $D_i^+$ and $D_i^-$ as $S$ and $R$ in the VIKO
 compared to the standard VIKOR method.
 
 ---
+Our aim is to prove that our AHTOVIK approach provides better ranking consistency under criterion perturbations, exhibits robustness to noise due to attenuated sensitivity coefficients and achieves greater closeness to the positive ideal solution compared to the standard VIKOR formulation. For this purpose, the theoretical foundation for analysing the sensitivity and stability in MCDM established by Opricovic and Tzeng (2004) [1] is considered. We focus on their comparative analysis of VIKOR and TOPSIS approaches and extending these foundational results we intend to prove our claims.
 
-## 3. Proof
+Opricovic and Tzeng proved that the Euclidean distance measure $D_i^+$ in TOPSIS method is less sensitive to noise and small perturbations in the decision matrix compared to the $S_i$ in VIKOR method. This is because the $S_i$ relies on an additive aggregation. They also empirically proved that the rank order in TOPSIS remains more stable under data uncertainty. 
+The formal comparison of sensitivity of $S_i$ and $D_i^+$ proved that $D_i^+$ exhibits smoother responses to small perturbations $δv_{ij}$. With these observations, we intend to show that the AHTOVIK index inherits these stability properties and thus offers better ranking consistency, noise robustness, and improved closeness to ideal solutions.
 
+Ranking Consistency
+From [1], $D_i^+$ is less sensitive to data variations than $S_i$. Thus, we can conclude the formalization of this by using the partial derivaties as follows, 
 
-### Step A — Normalisation Property
+$$\frac{\partial S_i}{\partial f_{ij}} = -\frac{w_j}{\Delta_j}$$
 
-Let $D_i^+$ ≥ 0 and  $D_i^- ​≥0$ be the Euclidean distances of alternative 𝑖  to the positive and negative ideal solutions, respectively. 
-
-Define 
-
-$$Q_i = v \cdot \frac{D_i^+}{D_i^+ + D_i^-} + (1 - v) \cdot \frac{D_i^+}{D_i^+ + D_i^-}, \qquad v \in [0,1].$$
-
-Then for every alternative 𝑖,
-
-$$
-0 \le Q_i \le 1.
-$$
-
-As both denominators are the same, we can modify the above equation for $Q_i$ as follows:
-
-$$Q_i = (v + (1 - v)) \cdot \frac{D_i^+}{D_i^+ + D_i^-} = \frac{D_i^+}{D_i^+ + D_i^-}.$$
-
-v+(1−v)=1, so the convex weights do not change the value when applied to identical inner terms.
-
-By the definition of the TOPSIS ideal distances,
-$(D_{i}^{+} \ge 0)$ and $(D_{i}^{-} \ge 0)$,
-therefore the denominator
-$(D_{i}^{+} + D_{i}^{-}) \ge 0$.
-
-As the Euclidean distances are non-negative quantities, the numerator is also non-negative.
-Thus, we can prove the non-negativity of the denominator in all conditions.
-
-Now, let us consider two cases where
-$(D_{i}^{+} + D_{i}^{-}) > 0$ and $(D_{i}^{+} + D_{i}^{-}) = 0$.
-
-For $(D_{i}^{+} + D_{i}^{-}) > 0$, using the basic inequality for fractions, we have:
-
-$$
-0 \le \frac{D_{i}^{-}}{D_{i}^{+} + D_{i}^{-}} \le 1
-$$
-
-Dividing all parts of the inequality by the positive number $(D_{i}^{+} + D_{i}^{-})$ gives:
-
-$$
-0 \le \frac{D_{i}^{-}}{D_{i}^{+} + D_{i}^{-}} \le 1
-$$
-
-Thus:
-
-$$
-0 \le Q_i \le 1
-$$  in this case.
-
-For the case $(D_{i}^{+} + D_{i}^{-}) = 0$,
-this equality can only hold if $(D_{i}^{+} = 0 \text{ and } D_{i}^{-} = 0)$ simultaneously.
-This is a degenerate situation where the alternative coincides with both ideal and anti-ideal solutions.
-
-By convention, to avoid undefined expressions:
-
-$$
-\frac{D_{i}^{-}}{D_{i}^{+} + D_{i}^{-}} = 0 \quad \text{when} \quad D_{i}^{+} = D_{i}^{-} = 0.
-$$
-
-So here $(Q_i = 0)$,
-which lies in $[0, 1]$.
-
-
-From this, we can conclude that:
-
-$$0 \le Q_i \le 1$$    in all circumstances.
+$$\frac{\partial D_i^+}{\partial f_{ij}} = \frac{w_j(v_{ij}-1)}{D_i^+\Delta_j}$$
 
 
 
 
----
 
-### Step B — Robustness Analysis
-
-Define sensitivity of $Q_i$ to criterion changes:
-
-$$
-\frac{\partial Q_i}{\partial f_{ij}}.
-$$
-
-For this method:
-
-$$
-\frac{\partial S_i}{\partial f_{ij}} = w_j (v_{ij} - v_j^+)
-\frac{1}{D_i^+}
-\frac{\partial v_{ij}}{\partial f_{ij}}.
-$$
-
-In standard VIKOR, sensitivity is:
-
-$$
-\frac{\partial S_i}{\partial f_{ij}} = w_j
-\frac{f_j^* - f_{ij}}{f_j^* - f_j^-}.
-$$
-
-**Observation:**
-TOPSIS distances smooth differences via Euclidean aggregation $\rightarrow$ reducing sensitivity to noise/outliers.
-
-**Mathematical criterion:**
-If:
-
-$$
-\left| \frac{\partial S_i}{\partial f_{ij}} \right|_{\text{modified}} < \left| \frac{\partial S_i}{\partial f_{ij}} \right|_{\text{standard}},
-$$
-
-Then the modified method is provably more robust.
-
----
-
-### Step C — Closeness to Ideal
-
-Standard VIKOR aggregates normalised criteria, and it doesn’t explicitly minimise a distance metric.
-
-The chosen method explicitly minimises $D^+$ and maximises $D^-$, directly aligning with the ideal solution concept in Multi-Criteria Decision Making.
-
-**Mathematical proof:**
-TOPSIS ranks alternatives by:
-
-$$
-C_i = \frac{D_i^-}{D_i^+ + D_i^-}.
-$$
-
-The modified VIKOR embeds this distance-based philosophy while adding the compromise structure of VIKOR:
-
-$$
-Q_i = v \frac{D_i^+ - D^{*+}}{D^{-+} - D^{*+}} + (1-v) \frac{D_i^- - D^{--}}{D^{- -} - D^{--}}.
-$$
-
-This ensures the ranking minimises distance to the ideal and maximises distance from the worst-case simultaneously.
 
 
 
