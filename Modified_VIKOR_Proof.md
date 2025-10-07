@@ -62,6 +62,11 @@ $$\frac{\partial S_i}{\partial f_{ij}} = -\frac{w_j}{\Delta_j}$$
 
 $$\frac{\partial D_i^+}{\partial f_{ij}} = \frac{w_j(v_{ij}-1)}{D_i^+\Delta_j}$$
 
+Hence the inequality showing the TOPSIS sensitivity is less than that of VIKOR sensitivity is as follows,
+
+$$\Big|\frac{\partial D_i^+}{\partial f_{ij}}\Big| = \frac{w_j|1-v_{ij}|}{D_i^+\Delta_j} < \frac{w_j}{\Delta_j} = \Big|\frac{\partial S_i}{\partial f_{ij}}\Big|$$
+
+
 
 
 
