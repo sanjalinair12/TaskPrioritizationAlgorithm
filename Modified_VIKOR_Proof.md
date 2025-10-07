@@ -73,6 +73,7 @@ $$Q_{iMod}= \alpha S_i + (1-\alpha) D_i^+, \quad 0 \leq \alpha \leq 1$$
 The partial derivative of the modified  $Q_i$ ($Q_{iMod}$) with respect to a change in the criterion value $f_{ij}$ is:
 
 $$\frac{\partial Q_{iMod}}{\partial f_{ij}} = \frac{w_j}{\Delta_j}\left[-\alpha + (1-\alpha)\frac{v_{ij}-1}{D_i^+}\right]$$
+
 Taking the absolute value, the marginal sensitivity of $Q_{iMod}$ is shown to be less than the sensitivity of the purely linear $S_i$ (where $\alpha=1$):
 
 $$\left|\frac{\partial Q_{iMod}}{\partial f_{ij}}\right| = \frac{w_j}{\Delta_j}\left|\alpha - (1-\alpha)\frac{|1-v_{ij}|}{D_i^+}\right| < \frac{w_j}{\Delta_j}$$
