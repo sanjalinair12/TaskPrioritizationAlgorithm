@@ -66,6 +66,11 @@ Hence the inequality showing the TOPSIS sensitivity is less than that of VIKOR s
 
 $$\Big|\frac{\partial D_i^+}{\partial f_{ij}}\Big| = \frac{w_j|1-v_{ij}|}{D_i^+\Delta_j} < \frac{w_j}{\Delta_j} = \Big|\frac{\partial S_i}{\partial f_{ij}}\Big|$$
 
+The above equation quantifies the noise sensitivity inequality proved in [1]. Now we need to define the modified VIKOR Index $Q_{iMod}$ as follows,
+
+$$Q_{iMod}= \alpha S_i + (1-\alpha) D_i^+, \quad 0 \leq \alpha \leq 1$$
+
+
 
 
 
