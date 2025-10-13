@@ -34,7 +34,7 @@ def generate_launch_description():
     pkg_share_dir = get_package_share_directory('robot_allocator')
     world_file = os.path.join(pkg_share_dir, 'worlds', 'dynamic_arena.world')
     
-    # 1. Launch Gazebo with your custom world
+    # 1. Launch Gazebo with custom world
     # This requires the ROS 2 Gazebo package to be installed (gazebo_ros)
     gazebo_server = IncludeLaunchDescription(
         PythonLaunchDescriptionSource([os.path.join(
