@@ -73,6 +73,6 @@
   <xacro:snake_segment name="segment_4" parent_link="segment_3_link"/>
   <xacro:snake_segment name="segment_5" parent_link="segment_4_link"/>
   
-  <!-- Note: Requires specialized ROS 2 controller setup (not included here) to articulate all joints. -->
+ 
 
 </robot>
