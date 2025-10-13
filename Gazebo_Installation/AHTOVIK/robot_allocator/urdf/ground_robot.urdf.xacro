@@ -69,7 +69,6 @@
     </plugin>
   </gazebo>
   
-  <!-- NOTE: Wheels (links and joints) would need to be defined here for the plugin to work fully. 
-       This structure provides the foundation. -->
+ 
 
 </robot>
