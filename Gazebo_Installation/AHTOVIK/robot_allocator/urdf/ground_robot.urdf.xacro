@@ -1,0 +1,75 @@
+<?xml version="1.0"?>
+<robot name="ground_robot" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <!-- Constants -->
+  <xacro:property name="WHEEL_RADIUS" value="0.10" />
+  <xacro:property name="WHEEL_WIDTH" value="0.05" />
+  <xacro:property name="BASE_LENGTH" value="0.5" />
+  <xacro:property name="BASE_WIDTH" value="0.4" />
+  <xacro:property name="BASE_HEIGHT" value="0.2" />
+
+  <!-- Base Link -->
+  <link name="base_link">
+    <inertial>
+      <mass value="10.0"/>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <inertia ixx="0.4" ixy="0.0" ixz="0.0" iyy="0.4" iyz="0.0" izz="0.6"/>
+    </inertial>
+    <visual>
+      <geometry>
+        <box size="${BASE_LENGTH} ${BASE_WIDTH} ${BASE_HEIGHT}"/>
+      </geometry>
+      <material name="red">
+        <color rgba="0.8 0.1 0.1 1.0"/>
+      </material>
+    </visual>
+    <collision>
+      <geometry>
+        <box size="${BASE_LENGTH} ${BASE_WIDTH} ${BASE_HEIGHT}"/>
+      </geometry>
+    </collision>
+  </link>
+  
+  <!-- Placeholder for the lifting mechanism -->
+  <link name="lifter_arm_link">
+    <inertial>
+      <mass value="1.0"/>
+      <origin xyz="0 0 0.1" rpy="0 0 0"/>
+      <inertia ixx="0.01" ixy="0.0" ixz="0.0" iyy="0.01" iyz="0.0" izz="0.01"/>
+    </inertial>
+    <visual>
+      <geometry>
+        <box size="0.1 0.1 0.2"/>
+      </geometry>
+      <material name="green">
+        <color rgba="0.1 0.8 0.1 1.0"/>
+      </material>
+    </visual>
+  </link>
+  <joint name="lifter_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="lifter_arm_link"/>
+    <origin xyz="0.2 0 0.15" rpy="0 0 0"/>
+  </joint>
+
+  <!-- Gazebo Plugin for Differential Drive Control -->
+  <gazebo>
+    <plugin name="differential_drive_controller" filename="libgazebo_ros_diff_drive.so">
+      <ros>
+        <namespace>/</namespace>
+      </ros>
+      <update_rate>50.0</update_rate>
+      <left_joint>left_wheel_joint</left_joint>
+      <right_joint>right_wheel_joint</right_joint>
+      <wheel_separation>0.4</wheel_separation>
+      <wheel_diameter>${2 * WHEEL_RADIUS}</wheel_diameter>
+      <command_topic>cmd_vel</command_topic>
+      <odometry_topic>odom</odometry_topic>
+      <publish_odom>true</publish_odom>
+    </plugin>
+  </gazebo>
+  
+  <!-- NOTE: Wheels (links and joints) would need to be defined here for the plugin to work fully. 
+       This structure provides the foundation. -->
+
+</robot>

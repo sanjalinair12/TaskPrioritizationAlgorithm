@@ -1,0 +1,78 @@
+<?xml version="1.0"?>
+<robot name="snakebot" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <!-- Constants -->
+  <xacro:property name="SEGMENT_LENGTH" value="0.2" />
+  <xacro:property name="SEGMENT_RADIUS" value="0.05" />
+  <xacro:property name="NUM_SEGMENTS" value="5" />
+
+  <!-- Macro for creating a segment and connecting it to the previous link -->
+  <xacro:macro name="snake_segment" params="name parent_link">
+    <link name="${name}_link">
+      <inertial>
+        <mass value="0.5"/>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <inertia ixx="0.001" ixy="0.0" ixz="0.0" iyy="0.001" iyz="0.0" izz="0.001"/>
+      </inertial>
+      <visual>
+        <geometry>
+          <cylinder length="${SEGMENT_LENGTH}" radius="${SEGMENT_RADIUS}"/>
+        </geometry>
+        <material name="black">
+          <color rgba="0.1 0.1 0.1 1.0"/>
+        </material>
+      </visual>
+      <collision>
+        <geometry>
+          <cylinder length="${SEGMENT_LENGTH}" radius="${SEGMENT_RADIUS}"/>
+        </geometry>
+      </collision>
+    </link>
+
+    <!-- Joint connecting to the parent link (allows rotation around Y and Z axis) -->
+    <joint name="${name}_joint" type="revolute">
+      <parent link="${parent_link}"/>
+      <child link="${name}_link"/>
+      <origin xyz="${SEGMENT_LENGTH / 2} 0 0" rpy="0 0 0"/>
+      <!-- Axis configuration for serpentine movement (yaw and pitch required) -->
+      <axis xyz="0 1 0"/>
+      <limit effort="10.0" velocity="1.0" lower="-1.57" upper="1.57"/>
+    </joint>
+    
+    <gazebo reference="${name}_link">
+      <material>Gazebo/Black</material>
+    </gazebo>
+  </xacro:macro>
+
+  <!-- Initial Base Link -->
+  <link name="base_link">
+    <inertial>
+      <mass value="0.5"/>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <inertia ixx="0.001" ixy="0.0" ixz="0.0" iyy="0.001" iyz="0.0" izz="0.001"/>
+    </inertial>
+    <visual>
+      <geometry>
+        <cylinder length="${SEGMENT_LENGTH}" radius="${SEGMENT_RADIUS}"/>
+      </geometry>
+      <material name="yellow">
+        <color rgba="1.0 0.8 0.0 1.0"/>
+      </material>
+    </visual>
+    <collision>
+      <geometry>
+        <cylinder length="${SEGMENT_LENGTH}" radius="${SEGMENT_RADIUS}"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <!-- Create chain of segments -->
+  <xacro:snake_segment name="segment_1" parent_link="base_link"/>
+  <xacro:snake_segment name="segment_2" parent_link="segment_1_link"/>
+  <xacro:snake_segment name="segment_3" parent_link="segment_2_link"/>
+  <xacro:snake_segment name="segment_4" parent_link="segment_3_link"/>
+  <xacro:snake_segment name="segment_5" parent_link="segment_4_link"/>
+  
+  <!-- Note: Requires specialized ROS 2 controller setup (not included here) to articulate all joints. -->
+
+</robot>

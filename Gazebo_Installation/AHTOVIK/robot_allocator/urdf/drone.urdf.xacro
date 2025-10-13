@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<robot name="drone" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <!-- Base Link Definition -->
+  <link name="base_link">
+    <inertial>
+      <mass value="1.5"/>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <inertia ixx="0.01" ixy="0.0" ixz="0.0" iyy="0.01" iyz="0.0" izz="0.02"/>
+    </inertial>
+    <visual>
+      <geometry>
+        <!-- Simple cross shape for the body -->
+        <box size="0.6 0.6 0.05"/> 
+      </geometry>
+      <material name="blue">
+        <color rgba="0.1 0.1 0.8 1.0"/>
+      </material>
+    </visual>
+    <collision>
+      <geometry>
+        <box size="0.6 0.6 0.05"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <!-- Gazebo Plugin for Multirotor Control -->
+  <!-- This is the crucial part that allows the model to be controlled as a drone -->
+  <gazebo>
+    <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so"/>
+  </gazebo>
+  
+  <gazebo reference="base_link">
+    <material>Gazebo/Blue</material>
+    <self_collide>true</self_collide>
+    <!-- Simplified Multirotor Plugin - Requires dedicated setup, using ROS control as a placeholder -->
+  </gazebo>
+
+</robot>
