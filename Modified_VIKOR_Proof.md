@@ -86,6 +86,7 @@ $$|\delta Q_{iMod}| < |\delta S_i|$$
 The above equation implies there is no rank reversal for small $\delta$ values ensuring consistent rankings under perturbations. 
 
 Robustness to Noise
+
 Opricovic & Tzeng demonstrated TOPSIS’s robustness empirically. 
 We intend to prove it quantitatively for AHTOVIK method.
 $$M_{QMod} := \max_{i,j} \Big|\frac{\partial Q_{iMod}}{\partial f_{ij}}\Big| \quad \text{and} \quad M_{S} := \max_{i,j} \Big|\frac{\partial S_i}{\partial f_{ij}}\Big|.$$ 
