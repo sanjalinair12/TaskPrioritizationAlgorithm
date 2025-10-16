@@ -62,8 +62,10 @@ $$\frac{\partial S_i}{\partial f_{ij}} = \frac{\partial}{\partial f_{ij}} \left(
 
 $$\frac{\partial S_i}{\partial f_{ij}} = -\frac{w_j}{\Delta_j}$$
 
-Then by applying  the chain rule to the $(D_i^+)^2 = \sum_{k=1}^{n} w_k (v_{ik}-v_k^+)^2$ and assuming $v_k^+\approx1$.
+Then by applying  the chain rule to the $(D_i^+)^2 = \sum_{k=1}^{n} w_k (v_{ik}-v_k^+)^2$ and assuming $v_k^+\approx1$ (assumption based on perturbation theory used by Thomas Saaty, founder of AHP).
 Also consider that the v_{ij] and f_{ij} has a linear relationship in the range $$\Delta_j$$, the partial derivative can be modified as,
+
+
 $$2 D_i^+ \frac{\partial D_i^+}{\partial f_{ij}} = \frac{\partial}{\partial f_{ij}} \left( w_j(v_{ij}-v_j^+)^2 \right)$$
 
 then,
