@@ -54,7 +54,7 @@ Our aim is to prove that our AHTOVIK approach provides better ranking consistenc
 Opricovic and Tzeng proved that the Euclidean distance measure $D_i^+$ in TOPSIS method is less sensitive to noise and small perturbations in the decision matrix compared to the $S_i$ in VIKOR method. This is because the $S_i$ relies on an additive aggregation. They also empirically proved that the rank order in TOPSIS remains more stable under data uncertainty. 
 The formal comparison of sensitivity of $S_i$ and $D_i^+$ proved that $D_i^+$ exhibits smoother responses to small perturbations $δv_{ij}$. With these observations, we intend to show that the AHTOVIK index inherits these stability properties and thus offers better ranking consistency, noise robustness, and improved closeness to ideal solutions.
 
-Ranking Consistency
+**Ranking Consistency**
 
 
 Let the  normalized decision matrix be $$f_{ij}$$ and $${\Delta_j}$$ represents the range of criterion j.From [1], $D_i^+$ is less sensitive to data variations than $S_i$. Thus, we can conclude the formalization of this by using the partial derivaties as follows, 
@@ -97,7 +97,7 @@ $$|\delta Q_{iMod}| < |\delta S_i|$$
 
 The above equation implies there is no rank reversal for small $\delta$ values ensuring consistent rankings under perturbations. 
 
-Robustness to Noise
+**Robustness to Noise**
 
 Opricovic & Tzeng demonstrated TOPSIS’s robustness empirically. 
 We intend to prove it quantitatively for AHTOVIK method.
