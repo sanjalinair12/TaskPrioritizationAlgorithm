@@ -56,9 +56,18 @@ Opricovic and Tzeng proved that the Euclidean distance measure $D_i^+$ in TOPSIS
 The formal comparison of sensitivity of $S_i$ and $D_i^+$ proved that $D_i^+$ exhibits smoother responses to small perturbations $δv_{ij}$. With these observations, we intend to show that the AHTOVIK index inherits these stability properties and thus offers better ranking consistency, noise robustness, and improved closeness to ideal solutions.
 
 Ranking Consistency
-From [1], $D_i^+$ is less sensitive to data variations than $S_i$. Thus, we can conclude the formalization of this by using the partial derivaties as follows, 
+
+
+Let the  normalized decision matrix be $$f_{ij}$$ and $${\Delta_j}$$ represents the range of criterion j.From [1], $D_i^+$ is less sensitive to data variations than $S_i$. Thus, we can conclude the formalization of this by using the partial derivaties as follows, 
+$$\frac{\partial S_i}{\partial f_{ij}} = \frac{\partial}{\partial f_{ij}} \left( \sum_{k=1}^{n} w_k \frac{f_k^* - f_{ik}}{\Delta_k} \right) = -w_j \frac{1}{\Delta_j}$$
 
 $$\frac{\partial S_i}{\partial f_{ij}} = -\frac{w_j}{\Delta_j}$$
+
+Then by applying  the chain rule to the $(D_i^+)^2 = \sum_{k=1}^{n} w_k (v_{ik}-v_k^+)^2$ and assuming $v_k^+\approx1$.
+Also consider that the v_{ij] and f_{ij} has a linear relationship in the range $$\Delta_j$$, the partial derivative can be modified as,
+$$2 D_i^+ \frac{\partial D_i^+}{\partial f_{ij}} = \frac{\partial}{\partial f_{ij}} \left( w_j(v_{ij}-v_j^+)^2 \right)$$
+
+then,
 
 $$\frac{\partial D_i^+}{\partial f_{ij}} = \frac{w_j(v_{ij}-1)}{D_i^+\Delta_j}$$
 
@@ -71,6 +80,10 @@ The above equation quantifies the noise sensitivity inequality proved in [1]. No
 $$Q_{iMod}= \alpha S_i + (1-\alpha) D_i^+, \quad 0 \leq \alpha \leq 1$$
 
 The partial derivative of the modified  $Q_i$ ($Q_{iMod}$) with respect to a change in the criterion value $f_{ij}$ is:
+
+$$\frac{\partial Q_{iMod}}{\partial f_{ij}} = \alpha \frac{\partial S_i}{\partial f_{ij}} + (1-\alpha) \frac{\partial D_i^+}{\partial f_{ij}}$$
+
+$$\frac{\partial Q_{iMod}}{\partial f_{ij}} = \alpha \left(-\frac{w_j}{\Delta_j}\right) + (1-\alpha) \left(\frac{w_j(v_{ij}-1)}{D_i^+\Delta_j}\right)$$
 
 $$\frac{\partial Q_{iMod}}{\partial f_{ij}} = \frac{w_j}{\Delta_j}\left[-\alpha + (1-\alpha)\frac{v_{ij}-1}{D_i^+}\right]$$
 
@@ -96,6 +109,10 @@ $$\\
 M_{QMod} = \max_{i,j} \frac{w_j}{\Delta_j}\left|\alpha - (1-\alpha)\frac{|1-v_{ij}|}{D_i^+}\right| < \max_{j} \frac{w_j}{\Delta_j} = M_S.$$
 
 The above equation compares the maximum marginal sensitivities of the AHTOVIK to the standard VIKOR approach.
+As the value of $$M_{QMod}$$ < $M_{S}$ it will follow the marginal sensitivity of the AHTOVIK index $$Q_{iMod}$$ for the perturbations caused by the input data. We can say that this is strictly lower than that of the standard VIKOR score $$S_i$$. Thus any small disturbance in the decision matrix will produce a smaller variation for the AHTOVIK than the standard VIKOR for the composite scores.
+Thus we can formally state that,
+
+$$|\delta Q_{i}^{\text{Mod}}| \leq M_{Q}^{\text{Mod}} |\delta f_{ij}|$$
 
 
 
