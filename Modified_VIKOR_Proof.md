@@ -104,15 +104,25 @@ Opricovic & Tzeng demonstrated TOPSIS’s robustness empirically.
 We intend to prove it quantitatively for AHTOVIK method.
 $$M_{QMod} := \max_{i,j} \Big|\frac{\partial Q_{iMod}}{\partial f_{ij}}\Big| \quad \text{and} \quad M_{S} := \max_{i,j} \Big|\frac{\partial S_i}{\partial f_{ij}}\Big|.$$ 
 
-$$\\
-\text{Then:} \\
-M_{QMod} = \max_{i,j} \frac{w_j}{\Delta_j}\left|\alpha - (1-\alpha)\frac{|1-v_{ij}|}{D_i^+}\right| < \max_{j} \frac{w_j}{\Delta_j} = M_S.$$
+Substituing values of M_s,
+
+$$M_{S} = \max_{i,j}\left|-w_j\Delta_j\right| = \max_{j} w_j\Delta_j$$
+
+and $$M_{QMod}$$,
+
+
+$$M_{QMod} = \max_{i,j} \left( w_j\Delta_j \frac{|\alpha - (1-\alpha)|}{1 - v_{ij}|D_i^+|} \right)$$
+
+we get
+
+
+$$M_{QMod} = \max_{i,j} \frac{w_j}{\Delta_j}\left|\alpha - (1-\alpha)\frac{|1-v_{ij}|}{D_i^+}\right| < \max_{j} \frac{w_j}{\Delta_j} = M_S.$$
 
 The above equation compares the maximum marginal sensitivities of the AHTOVIK to the standard VIKOR approach.
 As the value of $$M_{QMod}$$ < $M_{S}$ it will follow the marginal sensitivity of the AHTOVIK index $$Q_{iMod}$$ for the perturbations caused by the input data. We can say that this is strictly lower than that of the standard VIKOR score $$S_i$$. Thus any small disturbance in the decision matrix will produce a smaller variation for the AHTOVIK than the standard VIKOR for the composite scores.
 Thus we can formally state that,
 
-$$|\delta Q_{i}^{\text{Mod}}| \leq M_{Q}^{\text{Mod}} |\delta f_{ij}|$$
+$$|\delta Q_{iMod}| \leq M_{QMod} |\delta f_{ij}|$$
 
 
 
