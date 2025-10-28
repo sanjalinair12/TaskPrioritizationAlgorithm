@@ -21,7 +21,7 @@ This AhToVIK project implements a robot task assignment system using the Analyti
 ## Validation
 ---------------
 The AhToVik is validated against two most commonly used industrial approaches and two recent, promising academic research areas to assess its effectiveness against various factors.
-<img width="1411" height="450" alt="image" src="images/Comparison.png" />
+<img width="1411" height="450" alt="image" src="images/Comparison_of_Approaches.png" />
 
 ## Requirements
 ---------------
