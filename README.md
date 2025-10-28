@@ -45,7 +45,7 @@ The AhToVik is validated against two most commonly used industrial approaches an
    ## Usage
 ---------
 
-1.  Run the script: `python SearchAndRescue.py`
+1.  Run the script: `python Search&Rescue_with_input_options`
 2.  Follow the prompts to input the number of robots, robot types, and task types.
 3.  Enter the pairwise comparisons for the criteria to calculate the weights.
 4.  Input the values for each robot and scores for each task.
