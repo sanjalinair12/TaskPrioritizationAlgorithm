@@ -34,9 +34,12 @@ The AhToVik is validated against two most commonly used industrial approaches an
 ## Simulation
 ---------------
 The simulation of the algorithm has been performed on two different platforms.
---- Google Colab 
-                &
---- Gazebo
+
+
+-> Google Colab   &
+
+                
+-> Gazebo
 
 
 ## Requirements for Google Colab Simulation/ Any IDE with Python
