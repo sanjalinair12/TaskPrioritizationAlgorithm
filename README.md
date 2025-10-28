@@ -3,7 +3,7 @@
 
 
 
-# Robot Task Assignment using Multi-Criteria Decision Making Approaches
+# AhToVik- A Dynamic Task Allocation Approach for Heterogeneous Multi-Robot Systems using Multi-Criteria Decision Making Approaches
 ==============================================
 
 ## Overview
