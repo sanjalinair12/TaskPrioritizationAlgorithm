@@ -6,7 +6,7 @@
 
 This AhToVIK project implements a robot task assignment system using the Analytic Hierarchy Process (AHP), TOPSIS, and VIKOR methods. The system considers multiple criteria and task types to assign robots to tasks. 
 
-<img width="1411" height="1000" alt="image" src="images/AHTOVIK (2).png" />
+<img width="1411" height="700" alt="image" src="images/AHTOVIK (2).png" />
 
 ## Features
 ------------
