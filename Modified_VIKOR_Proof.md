@@ -127,19 +127,8 @@ $$|\delta Q_{iMod}| \leq M_{QMod} |\delta f_{ij}|$$
 
 
 References:
-1. @article{OPRICOVIC2004445,
-title = {Compromise solution by MCDM methods: A comparative analysis of VIKOR and TOPSIS},
-journal = {European Journal of Operational Research},
-volume = {156},
-number = {2},
-pages = {445-455},
-year = {2004},
-issn = {0377-2217},
-doi = {https://doi.org/10.1016/S0377-2217(03)00020-1},
-url = {https://www.sciencedirect.com/science/article/pii/S0377221703000201},
-author = {Serafim Opricovic and Gwo-Hshiung Tzeng},
-}
-
+1. S. Opricovic and G.-H. Tzeng, “Compromise solution by mcdm methods: A comparative analysis of vikor and topsis,” European Journal of Operational Research, vol. 156, no. 2, pp. 445–455, 2004.
+[Online]. Available: https://www.sciencedirect.com/science/article/pii/S0377221703000201
 
 
 
