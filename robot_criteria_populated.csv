@@ -1,0 +1,7 @@
+﻿Criteria,Navigation Efficiency,Payload Capacity,Safety,Communication Effectiveness,Adaptability,Energy Efficiency
+Navigation Efficiency,1,3,2,4,5,2
+Payload Capacity,0.33,1,0.5,2,3,0.33
+Safety,0.5,2,1,3,4,2
+Communication Effectiveness,0.25,0.5,0.33,1,2,0.33
+Adaptability,0.2,0.33,0.25,0.5,1,0.25
+Energy Efficiency,0.5,2,0.25,3,4,1
