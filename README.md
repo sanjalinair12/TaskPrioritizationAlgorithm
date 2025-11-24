@@ -6,10 +6,17 @@
 # AhToVik- A Dynamic Task Allocation Approach for Heterogeneous Multi-Robot Systems using Multi-Criteria Decision Making Approaches
 ==============================================
 
+
+The AhToVik algorithm is a novel and hybrid approach that combines different multi-criteria decision-making methods to achieve dynamic task prioritization and heterogeneous team formation. This integrated approach
+enables multi-criteria evaluation, addresses conflicting criteria, and ensures the best-compromised solution possible.
+
+
+<img width="1411" height="600" alt="image" src="images/Scenario (1).jpg" />
+
 ## Overview
 ------------
 
-This AhToVIK project implements a robot task assignment system using the Analytic Hierarchy Process (AHP), TOPSIS, and VIKOR methods. The system considers multiple criteria and task types to assign robots to tasks. 
+This AhToVIK project implements a multi-robot task assignment algorithm using the Analytic Hierarchy Process (AHP), TOPSIS, and VIKOR methods. The system considers multiple criteria and task types to assign robots to tasks. 
 
 <img width="1411" height="600" alt="image" src="images/AHTOVIK (2).png" />
 
@@ -21,7 +28,7 @@ This AhToVIK project implements a robot task assignment system using the Analyti
 *   VIKOR method for robot ranking
 *   Task prioritization  and team formation based on criteria weights
 *   Robot assignment to tasks based on rankings and task requirements.
-<img width="1411" height="600" alt="image" src="images/Scenario (1).png" />
+
 
 ## Validation
 ---------------
