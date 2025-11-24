@@ -21,7 +21,7 @@ This AhToVIK project implements a robot task assignment system using the Analyti
 *   VIKOR method for robot ranking
 *   Task prioritization  and team formation based on criteria weights
 *   Robot assignment to tasks based on rankings and task requirements.
-
+<img width="1411" height="600" alt="image" src="images/Scenario (1).png" />
 
 ## Validation
 ---------------
