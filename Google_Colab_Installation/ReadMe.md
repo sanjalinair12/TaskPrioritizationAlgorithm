@@ -1,4 +1,4 @@
-<img width="1488" height="217" alt="image" src="Google_Colab_Installation/images/Task_Assignment" />
+<img width="1488" height="217" alt="image" src="Google_Colab_Installation/images/Task_Assignment.png" />
 # Project Data
 
 Since GitHub cannot natively display .xlsx files, the .csv version provides a preview for the input data sheets.
