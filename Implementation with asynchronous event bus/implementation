@@ -1,0 +1,121 @@
+import numpy as np
+import matplotlib.pyplot as plt
+from matplotlib.animation import FuncAnimation
+from IPython.display import HTML
+from matplotlib.lines import Line2D
+
+class ReliableCoordinationEngine:
+    def __init__(self, robots):
+        self.robots = robots
+
+    def allocate_teams(self, active_mask):
+        # 1. Filter only operational robots
+        available = [r for r in self.robots if active_mask[r['ID']]]
+        
+        # Sort pools by Q_Index (Lowest Q = Best)
+        drones = sorted([r for r in available if r['Type'] == 'Drone'], key=lambda x: x['Q_Index'])
+        grounds = sorted([r for r in available if r['Type'] == 'Ground Robot'], key=lambda x: x['Q_Index'])
+        creepers = sorted([r for r in available if r['Type'] == 'Creeper Robot'], key=lambda x: x['Q_Index'])
+
+        assignments = {} # Format: {robot_id: task_name}
+        
+        # --- TASK 1: Scan and Rescue ---
+        # Needs 1 Drone, 1 Ground
+        if drones and grounds:
+            d = drones.pop(0)
+            g = grounds.pop(0)
+            assignments[d['ID']] = 'Scan & Rescue'
+            assignments[g['ID']] = 'Scan & Rescue'
+
+        # --- TASK 2: Supply Necessities ---
+        # Needs 1 Ground, 1 Creeper
+        if grounds and creepers:
+            g = grounds.pop(0)
+            c = creepers.pop(0)
+            assignments[g['ID']] = 'Supply'
+            assignments[c['ID']] = 'Supply'
+
+        # --- TASK 3: Lifting Remains ---
+        # Needs  1  Ground Robot
+        if grounds:
+            g = grounds.pop(0)
+            assignments[g['ID']] = 'Lifting'
+
+        return assignments
+
+# --- SETUP ---
+def prepare_simulation():
+    # Larger pool for multiple tasks
+    types = ['Drone', 'Drone', 'Ground Robot', 'Ground Robot', 'Ground Robot', 'Ground Robot', 'Creeper Robot', 'Creeper Robot']
+    robots = []
+    for i, t in enumerate(types):
+        robots.append({
+            'ID': f"{t[0]}{i}",
+            'Type': t,
+            'Q_Index': np.round(np.random.uniform(0.05, 0.95), 2),
+            'Pos': np.random.uniform(10, 90, 2) 
+        })
+    return robots
+
+robots_data = prepare_simulation()
+engine = ReliableCoordinationEngine(robots_data)
+active_status = {r['ID']: True for r in robots_data}
+
+# Define Task Locations
+tasks_config = {
+    'Scan & Rescue': {'pos': np.array([20, 80]), 'color': 'magenta'},
+    'Supply': {'pos': np.array([80, 80]), 'color': 'orange'},
+    'Lifting': {'pos': np.array([50, 20]), 'color': 'cyan'}
+}
+
+fig, ax = plt.subplots(figsize=(10, 8))
+
+def update(frame):
+    ax.clear()
+    ax.set_xlim(0, 100); ax.set_ylim(0, 100)
+    
+    # Draw Task Zones
+    for name, info in tasks_config.items():
+        ax.add_patch(plt.Circle(info['pos'], 4, color=info['color'], alpha=0.2))
+        ax.text(info['pos'][0]-5, info['pos'][1]+6, name, fontweight='bold', color=info['color'], fontsize=8)
+
+    # --- EVENT: STALL ---
+    if frame == 50:
+        # Fail the robot assigned to the first task
+        current_allocs = engine.allocate_teams(active_status)
+        for rid, task in current_allocs.items():
+            if task == 'Scan & Rescue':
+                active_status[rid] = False
+                print(f"STALL: {rid} failed during {task}. Reallocating pool...")
+                break
+
+    # Get current assignments
+    assignments = engine.allocate_teams(active_status)
+    
+    for r in robots_data:
+        rid = r['ID']
+        is_active = active_status[rid]
+        task_name = assignments.get(rid)
+        
+        if not is_active:
+            color, marker, alpha = 'red', 'x', 0.8
+        elif task_name:
+            color = tasks_config[task_name]['color']
+            marker, alpha = 'o', 1.0
+            # Move to specific task target
+            target = tasks_config[task_name]['pos']
+            dist = target - r['Pos']
+            if np.linalg.norm(dist) > 1:
+                r['Pos'] += (dist) * 0.04
+        else:
+            color, marker, alpha = 'gray', 'o', 0.2
+
+        ax.scatter(r['Pos'][0], r['Pos'][1], c=color, s=200, marker=marker, alpha=alpha, edgecolors='black' if task_name else None)
+        ax.text(r['Pos'][0]+2, r['Pos'][1]+2, f"{rid}\nQ:{r['Q_Index']}", fontsize=7)
+
+    ax.set_title(f"Heterogeneous Multi- Robot Task Allocation | Frame {frame}", fontsize=12)
+    ax.grid(True, alpha=0.1)
+
+ani = FuncAnimation(fig, update, frames=120, interval=80)
+plt.close()
+HTML(ani.to_jshtml())
