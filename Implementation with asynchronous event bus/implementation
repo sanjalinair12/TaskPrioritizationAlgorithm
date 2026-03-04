@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 from IPython.display import HTML, display
 
-# --- 1. EXCEL DATA INGESTION ---
+# --- 1. INPUT DATA FROM EXCEL ---
 def get_input_from_excel():
     file_path = input("Enter the path to your Excel file (e.g., data.xlsx): ")
     try:
@@ -31,7 +31,7 @@ def get_input_from_excel():
         print(f"Error reading Excel file: {e}")
         return None
 
-# --- 2. AHP & VIKOR MATHEMATICAL ENGINE ---
+# --- 2. THE TASK PRIORITIZATION AND TEAM FORMATION MATHEMATICAL ENGINE ---
 def calculate_metrics(matrix, robots, tasks):
     eigenvalues, eigenvectors = np.linalg.eig(matrix)
     weights = np.abs(eigenvectors[:, np.argmax(eigenvalues)])
@@ -108,7 +108,7 @@ class ReliableCoordinationEngine:
                 for r_obj in [gr.pop(0), cr.pop(0)]: new_asgn[r_obj['ID']] = tt
         self.assignments = new_asgn
 
-# --- 5. MAIN EXECUTION & VISUALIZATION ---
+# --- 5. EXECUTION & VISUALIZATION ---
 def main():
     data = get_input_from_excel()
     if not data: return
@@ -138,7 +138,7 @@ def main():
             if active_working:
                 bus.emit("STALL", active_working[0])
 
-        # Render Fleet
+        # Render Heterogeneous Robot Fleet
         for r in robots:
             current_id = r['ID']
             task = engine.assignments.get(current_id)
