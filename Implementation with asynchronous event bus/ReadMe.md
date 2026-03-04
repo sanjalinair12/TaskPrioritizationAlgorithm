@@ -1,2 +1,2 @@
-<video src="Implementation%20with%20asynchronous%20event%20bus/coordination_simulation.mp4" controls="controls" style="max-width: 100%;">
-</video>
+The implementation of the algorithm with an asynchronous event bus in Google Colab is depicted in this folder. Follow the same steps as in the DATA_INPUT_INSTRUCTIONS in Google_Colab_Installation for executing the simulation. The user can use the same robot_criteria_populated.xlsx file as the inputs
+
