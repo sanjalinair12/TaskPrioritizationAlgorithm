@@ -1,167 +1,310 @@
+# =====================================================
+# HETEROGENEOUS MULTI-ROBOT TASK ALLOCATION SYSTEM
+# AHP + TOPSIS + VIKOR MODEL
+# =====================================================
+
+!pip install openpyxl
+
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 from IPython.display import HTML, display
+from google.colab import files
 
-# --- 1. INPUT DATA FROM EXCEL ---
+# ----------------------------------------------------
+# 1. DATA INGESTION FROM EXCEL
+# ----------------------------------------------------
+
 def get_input_from_excel():
-    file_path = input("Enter the path to your Excel file (e.g., data.xlsx): ")
-    try:
-        df_criteria_comparison = pd.read_excel(file_path, sheet_name='Criteria Comparison', index_col=0)
-        df_robots = pd.read_excel(file_path, sheet_name='Robots')
-        df_tasks = pd.read_excel(file_path, sheet_name='Tasks', index_col=0)
-        
-        matrix = df_criteria_comparison.values
-        robots = []
-        for _, row in df_robots.iterrows():
-            robots.append({
-                'ID': str(row['ID']), 
-                'Type': row['Type'], 
-                'Values': row.iloc[2:].values.astype(float),
-                'Pos': np.random.uniform(10, 90, 2)
-            })
-            
-        tasks = []
-        for index, row in df_tasks.iterrows():
-            tasks.append({'Type': index, 'Scores': row.values.astype(float)})
-            
-        return matrix, robots, tasks
-    except Exception as e:
-        print(f"Error reading Excel file: {e}")
-        return None
 
-# --- 2. THE TASK PRIORITIZATION AND TEAM FORMATION MATHEMATICAL ENGINE ---
-def calculate_metrics(matrix, robots, tasks):
+    uploaded = files.upload()
+    file_path = list(uploaded.keys())[0]
+
+    df_criteria = pd.read_excel(
+        file_path,
+        sheet_name='Criteria Comparison',
+        index_col=0,
+        engine='openpyxl'
+    )
+
+    df_robots = pd.read_excel(
+        file_path,
+        sheet_name='Robots',
+        engine='openpyxl'
+    )
+
+    df_tasks = pd.read_excel(
+        file_path,
+        sheet_name='Tasks',
+        index_col=0,
+        engine='openpyxl'
+    )
+
+    matrix = df_criteria.values
+
+    robots = []
+
+    for _, row in df_robots.iterrows():
+
+        robots.append({
+            'ID': str(row['ID']),
+            'Type': row['Type'],
+            'Values': row.iloc[2:].values.astype(float),
+            'Pos': np.random.uniform(10,90,2)
+        })
+
+    tasks = []
+
+    for index, row in df_tasks.iterrows():
+
+        tasks.append({
+            'Type': index,
+            'Scores': row.values.astype(float)
+        })
+
+    return matrix, robots, tasks
+
+
+# ----------------------------------------------------
+# 2. AHP + TOPSIS + VIKOR MODEL
+# ----------------------------------------------------
+
+def calculate_metrics_theoretical(matrix, robots, tasks, v=0.5):
+
+    # AHP weights
     eigenvalues, eigenvectors = np.linalg.eig(matrix)
+
     weights = np.abs(eigenvectors[:, np.argmax(eigenvalues)])
-    weights /= np.sum(weights)
-    
+    weights = weights / np.sum(weights)
+
+    # Task priority
     for t in tasks:
         t['Priority'] = np.dot(t['Scores'], weights)
+
     sorted_tasks = sorted(tasks, key=lambda x: x['Priority'], reverse=True)
 
+    # TOPSIS
     decision_matrix = np.array([r['Values'] for r in robots])
-    weighted = decision_matrix * weights
-    f_best, f_worst = np.max(weighted, axis=0), np.min(weighted, axis=0)
-    
-    S = np.sum((f_best - weighted) / (f_best - f_worst + 1e-9), axis=1)
-    R = np.max((f_best - weighted) / (f_best - f_worst + 1e-9), axis=1)
-    
-    v = 0.5
-    S_min, S_max = np.min(S), np.max(S)
-    R_min, R_max = np.min(R), np.max(R)
-    
-    Q = v * (S - S_min) / (S_max - S_min + 1e-9) + \
-        (1 - v) * (R - R_min) / (R_max - R_min + 1e-9)
+
+    weighted_dm = decision_matrix * weights
+
+    f_star = np.max(weighted_dm, axis=0)
+    f_minus = np.min(weighted_dm, axis=0)
+
+    D_plus = np.sqrt(np.sum((weighted_dm - f_star)**2, axis=1))
+    D_minus = np.sqrt(np.sum((weighted_dm - f_minus)**2, axis=1))
+
+    # VIKOR aggregation
+    DP_min, DP_max = np.min(D_plus), np.max(D_plus)
+    DM_min, DM_max = np.min(D_minus), np.max(D_minus)
+
+    denom_p = (DP_max - DP_min) if (DP_max - DP_min) != 0 else 1e-9
+    denom_m = (DM_max - DM_min) if (DM_max - DM_min) != 0 else 1e-9
 
     for i, r in enumerate(robots):
-        r['Q_Index'] = np.round(Q[i], 4)
-        
+
+        norm_DP = (D_plus[i] - DP_min) / denom_p
+        norm_DM = (DM_max - D_minus[i]) / denom_m
+
+        r['Q_Index'] = np.round(v * norm_DP + (1 - v) * norm_DM, 4)
+
     return robots, sorted_tasks
 
-# --- 3. ASYNCHRONOUS EVENT BUS ---
+
+# ----------------------------------------------------
+# 3. EVENT BUS
+# ----------------------------------------------------
+
 class EventBus:
+
     def __init__(self):
         self.listeners = {}
-    
-    def subscribe(self, event_type, callback):
-        if event_type not in self.listeners:
-            self.listeners[event_type] = []
-        self.listeners[event_type].append(callback)
-    
-    def emit(self, event_type, data=None):
-        if event_type in self.listeners:
-            for callback in self.listeners[event_type]:
+
+    def subscribe(self, event, callback):
+
+        if event not in self.listeners:
+            self.listeners[event] = []
+
+        self.listeners[event].append(callback)
+
+    def emit(self, event, data):
+
+        if event in self.listeners:
+
+            for callback in self.listeners[event]:
                 callback(data)
 
-# --- 4. RELIABLE COORDINATION ENGINE ---
-class ReliableCoordinationEngine:
-    def __init__(self, robots, sorted_tasks, bus):
+
+# ----------------------------------------------------
+# 4. COORDINATION ENGINE
+# ----------------------------------------------------
+
+class CoordinationEngine:
+
+    def __init__(self, robots, tasks, bus):
+
         self.robots = robots
-        self.sorted_tasks = sorted_tasks
+        self.tasks = tasks
         self.bus = bus
-        self.active_status = {r['ID']: True for r in robots}
+
+        self.active = {r['ID']: True for r in robots}
         self.assignments = {}
+
         self.bus.subscribe("STALL", self.handle_stall)
+
         self.reallocate()
 
     def handle_stall(self, rid):
-        print(f"\n[EVENT BUS] ALERT: Robot {rid} stalled. Reallocating...")
-        self.active_status[rid] = False
+
+        self.active[rid] = False
         self.reallocate()
 
     def reallocate(self):
-        available = [r for r in self.robots if self.active_status[r['ID']]]
-        dr = sorted([r for r in available if r['Type'] == 'Drone'], key=lambda x: x['Q_Index'])
-        gr = sorted([r for r in available if r['Type'] == 'Ground Robot'], key=lambda x: x['Q_Index'])
-        cr = sorted([r for r in available if r['Type'] == 'Creeper Robot'], key=lambda x: x['Q_Index'])
 
-        new_asgn = {}
-        for t in self.sorted_tasks:
-            tt = t['Type']
-            if tt == 'Scan and Rescue' and dr and len(gr) >= 2:
-                for r_obj in [dr.pop(0), gr.pop(0), gr.pop(0)]: new_asgn[r_obj['ID']] = tt
-            elif tt == 'Lifting Remains' and len(gr) >= 2:
-                for r_obj in [gr.pop(0), gr.pop(0)]: new_asgn[r_obj['ID']] = tt
-            elif tt == 'Supply Necessities' and gr and cr:
-                for r_obj in [gr.pop(0), cr.pop(0)]: new_asgn[r_obj['ID']] = tt
-        self.assignments = new_asgn
+        available = [r for r in self.robots if self.active[r['ID']]]
 
-# --- 5. EXECUTION & VISUALIZATION ---
+        drones = sorted(
+            [r for r in available if r['Type'] == 'Drone'],
+            key=lambda x: x['Q_Index']
+        )
+
+        ground = sorted(
+            [r for r in available if r['Type'] == 'Ground Robot'],
+            key=lambda x: x['Q_Index']
+        )
+
+        creeper = sorted(
+            [r for r in available if r['Type'] == 'Creeper Robot'],
+            key=lambda x: x['Q_Index']
+        )
+
+        new_assignments = {}
+
+        # Scan and Rescue
+        if drones and ground:
+
+            r1 = drones.pop(0)
+            r2 = ground.pop(0)
+
+            new_assignments[r1['ID']] = 'Scan and Rescue'
+            new_assignments[r2['ID']] = 'Scan and Rescue'
+
+        # Lifting Remains
+        if len(ground) >= 2:
+
+            r1 = ground.pop(0)
+            r2 = ground.pop(0)
+
+            new_assignments[r1['ID']] = 'Lifting Remains'
+            new_assignments[r2['ID']] = 'Lifting Remains'
+
+        # Supply Necessities
+        if ground and creeper:
+
+            r1 = ground.pop(0)
+            r2 = creeper.pop(0)
+
+            new_assignments[r1['ID']] = 'Supply Necessities'
+            new_assignments[r2['ID']] = 'Supply Necessities'
+
+        self.assignments = new_assignments
+
+
+# ----------------------------------------------------
+# 5. VISUALIZATION + ANIMATION
+# ----------------------------------------------------
+
 def main():
-    data = get_input_from_excel()
-    if not data: return
-    matrix, robots_in, tasks_in = data
 
-    robots, tasks = calculate_metrics(matrix, robots_in, tasks_in)
+    matrix, robots, tasks = get_input_from_excel()
+
+    robots, sorted_tasks = calculate_metrics_theoretical(matrix, robots, tasks)
+
     bus = EventBus()
-    engine = ReliableCoordinationEngine(robots, tasks, bus)
 
-    colors = {'Scan and Rescue': 'magenta', 'Supply Necessities': 'orange', 'Lifting Remains': 'cyan'}
-    t_pos = {'Scan and Rescue': [20, 80], 'Supply Necessities': [80, 80], 'Lifting Remains': [50, 20]}
-    
-    fig, ax = plt.subplots(figsize=(9, 7))
+    engine = CoordinationEngine(robots, sorted_tasks, bus)
+
+    colors = {
+        'Scan and Rescue': 'magenta',
+        'Supply Necessities': 'orange',
+        'Lifting Remains': 'cyan'
+    }
+
+    task_positions = {
+        'Scan and Rescue': [20,80],
+        'Supply Necessities': [80,80],
+        'Lifting Remains': [50,20]
+    }
+
+    fig, ax = plt.subplots(figsize=(10,7))
 
     def update(frame):
+
         ax.clear()
-        ax.set_xlim(0, 100); ax.set_ylim(0, 100)
-        
-        # Draw Tasks
-        for name, pos in t_pos.items():
-            ax.add_patch(plt.Circle(pos, 5, color=colors[name], alpha=0.15))
-            ax.text(pos[0]-8, pos[1]+7, name, fontweight='bold', fontsize=8)
 
-        # Trigger Event at Frame 40
-        if frame == 40:
-            active_working = [rid for rid, t in engine.assignments.items() if engine.active_status.get(rid, False)]
-            if active_working:
-                bus.emit("STALL", active_working[0])
+        ax.set_xlim(0,100)
+        ax.set_ylim(0,100)
 
-        # Render Heterogeneous Robot Fleet
+        # Draw task zones
+        for name,pos in task_positions.items():
+
+            ax.add_patch(plt.Circle(pos,6,color=colors[name],alpha=0.2))
+            ax.text(pos[0]-6,pos[1]+8,name,fontweight='bold')
+
+        # Robot failure simulation
+        if frame == 50:
+
+            active_ids = [rid for rid,a in engine.active.items() if a]
+
+            if active_ids:
+                bus.emit("STALL", active_ids[0])
+
         for r in robots:
-            current_id = r['ID']
-            task = engine.assignments.get(current_id)
-            is_active = engine.active_status.get(current_id, False)
-            
-            if not is_active:
-                ax.scatter(r['Pos'][0], r['Pos'][1], c='red', marker='x', s=150)
+
+            rid = r['ID']
+            task = engine.assignments.get(rid)
+            active = engine.active[rid]
+
+            if not active:
+
+                ax.scatter(r['Pos'][0],r['Pos'][1],c='red',marker='x',s=200)
+                ax.text(r['Pos'][0]+2,r['Pos'][1],"FAILED",color='red')
+
             else:
-                c = colors.get(task, 'gray')
-                ax.scatter(r['Pos'][0], r['Pos'][1], c=c, edgecolors='black', s=180, alpha=1 if task else 0.2)
+
+                color = colors.get(task,'gray')
+                alpha = 1 if task else 0.3
+
+                ax.scatter(r['Pos'][0],r['Pos'][1],c=color,s=200,edgecolors='black',alpha=alpha)
+
                 if task:
-                    r['Pos'] += (np.array(t_pos[task]) - r['Pos']) * 0.04
-            
-            ax.text(r['Pos'][0]+2, r['Pos'][1]+2, f"{current_id}\nQ:{r['Q_Index']}", fontsize=7)
 
-        ax.set_title(f"Fleet Coordination Engine | Frame {frame}")
-        ax.grid(True, alpha=0.1)
+                    target = np.array(task_positions[task])
+                    r['Pos'] += (target - r['Pos']) * 0.05
 
-    anim = FuncAnimation(fig, update, frames=100, interval=100)
+            ax.text(
+                r['Pos'][0]+3,
+                r['Pos'][1]+3,
+                f"{rid}\nQ:{r['Q_Index']}",
+                fontsize=8
+            )
+
+        ax.set_title(f"Heterogeneous Multi-Robot Task Allocation | Frame {frame}")
+
+        ax.grid(True,linestyle='--',alpha=0.4)
+
+    animation = FuncAnimation(fig, update, frames=120, interval=100)
+
     plt.close()
-    return anim
 
-# Execution
+    return animation
+
+
+# ----------------------------------------------------
+# RUN SIMULATION
+# ----------------------------------------------------
+
 anim = main()
-if anim:
-    display(HTML(anim.to_jshtml()))
+
+display(HTML(anim.to_jshtml()))
