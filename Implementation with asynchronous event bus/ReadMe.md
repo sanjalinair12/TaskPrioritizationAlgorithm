@@ -5,10 +5,10 @@ The implementation of the algorithm with an asynchronous event bus in Google Col
 The image depicts the initial team formation phase with respect to the task priority in a search and rescue scenario with three different tasks executing simultaneously.
 <img  src="images/image1.png" />
 
-Once an operation stall happens, another robot available in the nearest proximity will take over the task as shown in below images.
+Once an operation stalls, another robot available in the nearest proximity will take over the task as shown in below images.
 <img  src="images/image2.png" />
 
 <img  src="images/image3.png" />
 
 The scalability and the sensitivity of the algorithm when there is a fluctuation upto 10 percent is depicted below.
-<img  src="images/image4.png" />
+<img  src="images/image.png" />
