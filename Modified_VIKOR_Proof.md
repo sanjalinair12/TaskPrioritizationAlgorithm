@@ -39,7 +39,42 @@ Where:
 * $$v_j^- = \text{negative ideal (worst) value for criterion } j$$ (NIS)
 * $$w_j = \text{criterion weight}$$
 
+From the above equation, first we calculate raw weighted Euclidean distances for each individual alternative $i$. These values represent how far an alternative is from the Ideal ($D_i^+$) and Anti-Ideal ($D_i^-$) points in the $n$-dimensional space.
 
+As $D_i$ values are raw distances, they cannot be compared directly across different datasets or criteria sets. So we must identify the anchor points of the current set of alternatives.
+* For $D_i^+$: Identify the best performer ($\min D_i^+$) and the worst performer ($\max D_i^+$).
+* For $D_i^-$: Identify the safest performer ($\max D_i^-$) and the most vulnerable performer ($\min D_i^-$).
+
+As we map them to individual regret and group utility, it will be as follows:
+* Utility Mapping ($S_i$ equivalent):
+
+$$\text{Normalized } D_i^+ = \frac{D_i^+ - \min D_i^+}{\max D_i^+ - \min D_i^+}$$
+  
+This ensures that the "Best" robot gets a 0 and the "Worst" gets a 1 for the $v$ term.
+
+*Regret Mapping ($R_i$ equivalent):
+
+  $$\text{Normalized } D_i^- = \frac{\max D_i^- - d_i^-}{\max D_i^- - \min D_i^-}$$
+  
+This ensures that the "Safest" robot gets a 0 and the "Riskiest" gets a 1 for the $1-v$ term.
+
+The final modified VIKOR equation will be,
+
+$$Q_i = v \left[ \frac{d_i^+ - \min_i d_i^+}{\max_i d_i^+ - \min_i d_i^+} \right] + (1 - v) \left[ \frac{\max_i d_i^- - d_i^-}{\max_i d_i^- - \min_i d_i^-} \right]$$
+
+Where:
+* $d_i^+$: The Euclidean distance of alternative $i$ to the Positive Ideal Solution (PIS).
+* $\min_i d_i^+$: The distance of the "best" alternative (closest to PIS) in the entire set.
+* $\max_i d_i^+$: The distance of the "worst" alternative (furthest from PIS) in the entire set.
+* $d_i^-$: The Euclidean distance of alternative $i$ to the Negative Ideal Solution (NIS).
+* $\max_i d_i^-$: The distance of the "best" alternative (furthest from NIS) in the entire set.
+* $\min_i d_i^-$: The distance of the "worst" alternative (closest to NIS) in the entire set.
+* $v$: The weight for the strategy of "maximum group utility" (typically $v = 0.5$).
+
+The parameter $v$ represents the Weight of the Majority of Criteria. 
+* When $v > 0.5$: The model prioritizes Group Utility. It favors alternatives that are closest to the Positive Ideal Solution ($PIS$).
+* When $v < 0.5$: The model prioritizes Individual Stability. It favors alternatives that are furthest from the Negative Ideal Solution ($NIS$), effectively "minimizing regret" by avoiding the worst-case scenario.
+* When $v = 0.5$: It represents a consensus or compromise between the two forces.
 
 Using ideal distances from TOPSIS $D_i^+$ and $D_i^-$ as $S$ and $R$ in the VIKOR index improves:
 
