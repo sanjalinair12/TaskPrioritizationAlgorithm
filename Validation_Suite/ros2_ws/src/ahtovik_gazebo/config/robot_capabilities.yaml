@@ -1,0 +1,10 @@
+robots:
+  uav_count: 3
+  ugv_count: 4
+  creeper_count: 3
+criteria:
+  - battery
+  - health
+  - payload
+  - speed
+  - inverse_distance

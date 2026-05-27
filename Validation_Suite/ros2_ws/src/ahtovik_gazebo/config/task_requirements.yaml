@@ -1,0 +1,10 @@
+tasks:
+  Scan and Rescue:
+    Drone: 1
+    Ground Robot: 2
+  Supply Necessities:
+    Ground Robot: 1
+    Creeper Robot: 1
+  Lifting Remains:
+    Ground Robot: 1
+    Creeper Robot: 1
