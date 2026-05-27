@@ -1,0 +1,14 @@
+Metadata-Version: 2.4
+Name: ahtovik_gazebo
+Version: 0.0.1
+Summary: AhToVik ROS 2 Gazebo demo
+Maintainer: Anjali Santhosh
+Maintainer-email: sanjaliasn@gmail.com
+License: Apache-2.0
+Requires-Dist: setuptools
+Requires-Dist: numpy
+Dynamic: license
+Dynamic: maintainer
+Dynamic: maintainer-email
+Dynamic: requires-dist
+Dynamic: summary

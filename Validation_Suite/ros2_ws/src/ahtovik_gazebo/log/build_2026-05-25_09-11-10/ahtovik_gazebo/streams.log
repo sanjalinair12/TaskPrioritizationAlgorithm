@@ -1,0 +1,63 @@
+[0.983s] Invoking command in '/home/user/ros2_ws/src/ahtovik_gazebo': PYTHONPATH=/home/user/ros2_ws/src/build/ahtovik_gazebo/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/user/ros2_ws/src/install/ahtovik_gazebo/lib/python3.10/site-packages:${PYTHONPATH} _=/usr/bin/env /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../build/ahtovik_gazebo build --build-base /home/user/ros2_ws/src/build/ahtovik_gazebo/build install --record /home/user/ros2_ws/src/build/ahtovik_gazebo/install.log --single-version-externally-managed install_data
+[1.334s] running egg_info
+[1.354s] creating ../build/ahtovik_gazebo/ahtovik_gazebo.egg-info
+[1.355s] writing ../build/ahtovik_gazebo/ahtovik_gazebo.egg-info/PKG-INFO
+[1.355s] writing dependency_links to ../build/ahtovik_gazebo/ahtovik_gazebo.egg-info/dependency_links.txt
+[1.355s] writing entry points to ../build/ahtovik_gazebo/ahtovik_gazebo.egg-info/entry_points.txt
+[1.356s] writing requirements to ../build/ahtovik_gazebo/ahtovik_gazebo.egg-info/requires.txt
+[1.356s] writing top-level names to ../build/ahtovik_gazebo/ahtovik_gazebo.egg-info/top_level.txt
+[1.356s] writing manifest file '../build/ahtovik_gazebo/ahtovik_gazebo.egg-info/SOURCES.txt'
+[1.404s] reading manifest file '../build/ahtovik_gazebo/ahtovik_gazebo.egg-info/SOURCES.txt'
+[1.405s] writing manifest file '../build/ahtovik_gazebo/ahtovik_gazebo.egg-info/SOURCES.txt'
+[1.406s] running build
+[1.406s] running build_py
+[1.406s] creating /home/user/ros2_ws/src/build/ahtovik_gazebo/build/lib/ahtovik_gazebo
+[1.406s] copying ahtovik_gazebo/task_allocator_node.py -> /home/user/ros2_ws/src/build/ahtovik_gazebo/build/lib/ahtovik_gazebo
+[1.485s] copying ahtovik_gazebo/experiment_logger_node.py -> /home/user/ros2_ws/src/build/ahtovik_gazebo/build/lib/ahtovik_gazebo
+[1.488s] copying ahtovik_gazebo/telemetry_publisher_node.py -> /home/user/ros2_ws/src/build/ahtovik_gazebo/build/lib/ahtovik_gazebo
+[1.488s] copying ahtovik_gazebo/__init__.py -> /home/user/ros2_ws/src/build/ahtovik_gazebo/build/lib/ahtovik_gazebo
+[1.488s] copying ahtovik_gazebo/failure_injector_node.py -> /home/user/ros2_ws/src/build/ahtovik_gazebo/build/lib/ahtovik_gazebo
+[1.489s] running install
+[1.495s] running install_lib
+[1.517s] creating /home/user/ros2_ws/src/install/ahtovik_gazebo/lib/python3.10/site-packages/ahtovik_gazebo
+[1.517s] copying /home/user/ros2_ws/src/build/ahtovik_gazebo/build/lib/ahtovik_gazebo/task_allocator_node.py -> /home/user/ros2_ws/src/install/ahtovik_gazebo/lib/python3.10/site-packages/ahtovik_gazebo
+[1.517s] copying /home/user/ros2_ws/src/build/ahtovik_gazebo/build/lib/ahtovik_gazebo/experiment_logger_node.py -> /home/user/ros2_ws/src/install/ahtovik_gazebo/lib/python3.10/site-packages/ahtovik_gazebo
+[1.517s] copying /home/user/ros2_ws/src/build/ahtovik_gazebo/build/lib/ahtovik_gazebo/telemetry_publisher_node.py -> /home/user/ros2_ws/src/install/ahtovik_gazebo/lib/python3.10/site-packages/ahtovik_gazebo
+[1.518s] copying /home/user/ros2_ws/src/build/ahtovik_gazebo/build/lib/ahtovik_gazebo/__init__.py -> /home/user/ros2_ws/src/install/ahtovik_gazebo/lib/python3.10/site-packages/ahtovik_gazebo
+[1.518s] copying /home/user/ros2_ws/src/build/ahtovik_gazebo/build/lib/ahtovik_gazebo/failure_injector_node.py -> /home/user/ros2_ws/src/install/ahtovik_gazebo/lib/python3.10/site-packages/ahtovik_gazebo
+[1.519s] byte-compiling /home/user/ros2_ws/src/install/ahtovik_gazebo/lib/python3.10/site-packages/ahtovik_gazebo/task_allocator_node.py to task_allocator_node.cpython-310.pyc
+[1.522s] byte-compiling /home/user/ros2_ws/src/install/ahtovik_gazebo/lib/python3.10/site-packages/ahtovik_gazebo/experiment_logger_node.py to experiment_logger_node.cpython-310.pyc
+[1.523s] byte-compiling /home/user/ros2_ws/src/install/ahtovik_gazebo/lib/python3.10/site-packages/ahtovik_gazebo/telemetry_publisher_node.py to telemetry_publisher_node.cpython-310.pyc
+[1.524s] byte-compiling /home/user/ros2_ws/src/install/ahtovik_gazebo/lib/python3.10/site-packages/ahtovik_gazebo/__init__.py to __init__.cpython-310.pyc
+[1.524s] byte-compiling /home/user/ros2_ws/src/install/ahtovik_gazebo/lib/python3.10/site-packages/ahtovik_gazebo/failure_injector_node.py to failure_injector_node.cpython-310.pyc
+[1.525s] running install_data
+[1.525s] creating /home/user/ros2_ws/src/install/ahtovik_gazebo/share/ament_index/resource_index/packages
+[1.526s] copying resource/ahtovik_gazebo -> /home/user/ros2_ws/src/install/ahtovik_gazebo/share/ament_index/resource_index/packages
+[1.526s] copying package.xml -> /home/user/ros2_ws/src/install/ahtovik_gazebo/share/ahtovik_gazebo
+[1.526s] creating /home/user/ros2_ws/src/install/ahtovik_gazebo/share/ahtovik_gazebo/launch
+[1.526s] copying launch/validation.launch.py -> /home/user/ros2_ws/src/install/ahtovik_gazebo/share/ahtovik_gazebo/launch
+[1.527s] copying launch/demo.launch.py -> /home/user/ros2_ws/src/install/ahtovik_gazebo/share/ahtovik_gazebo/launch
+[1.527s] copying launch/gazebo_demo.launch.py -> /home/user/ros2_ws/src/install/ahtovik_gazebo/share/ahtovik_gazebo/launch
+[1.528s] creating /home/user/ros2_ws/src/install/ahtovik_gazebo/share/ahtovik_gazebo/worlds
+[1.528s] copying worlds/sar_world.sdf -> /home/user/ros2_ws/src/install/ahtovik_gazebo/share/ahtovik_gazebo/worlds
+[1.529s] creating /home/user/ros2_ws/src/install/ahtovik_gazebo/share/ahtovik_gazebo/config
+[1.529s] copying config/robot_capabilities.yaml -> /home/user/ros2_ws/src/install/ahtovik_gazebo/share/ahtovik_gazebo/config
+[1.529s] copying config/task_requirements.yaml -> /home/user/ros2_ws/src/install/ahtovik_gazebo/share/ahtovik_gazebo/config
+[1.530s] creating /home/user/ros2_ws/src/install/ahtovik_gazebo/share/ahtovik_gazebo/models/uav
+[1.530s] copying models/uav/model.sdf -> /home/user/ros2_ws/src/install/ahtovik_gazebo/share/ahtovik_gazebo/models/uav
+[1.530s] copying models/uav/model.config -> /home/user/ros2_ws/src/install/ahtovik_gazebo/share/ahtovik_gazebo/models/uav
+[1.531s] creating /home/user/ros2_ws/src/install/ahtovik_gazebo/share/ahtovik_gazebo/models/ugv
+[1.531s] copying models/ugv/model.sdf -> /home/user/ros2_ws/src/install/ahtovik_gazebo/share/ahtovik_gazebo/models/ugv
+[1.531s] copying models/ugv/model.config -> /home/user/ros2_ws/src/install/ahtovik_gazebo/share/ahtovik_gazebo/models/ugv
+[1.532s] creating /home/user/ros2_ws/src/install/ahtovik_gazebo/share/ahtovik_gazebo/models/creeper_robot
+[1.533s] copying models/creeper_robot/model.sdf -> /home/user/ros2_ws/src/install/ahtovik_gazebo/share/ahtovik_gazebo/models/creeper_robot
+[1.533s] copying models/creeper_robot/model.config -> /home/user/ros2_ws/src/install/ahtovik_gazebo/share/ahtovik_gazebo/models/creeper_robot
+[1.533s] running install_egg_info
+[1.559s] Copying ../build/ahtovik_gazebo/ahtovik_gazebo.egg-info to /home/user/ros2_ws/src/install/ahtovik_gazebo/lib/python3.10/site-packages/ahtovik_gazebo-0.0.1-py3.10.egg-info
+[1.560s] running install_scripts
+[1.612s] Installing experiment_logger_node script to /home/user/ros2_ws/src/install/ahtovik_gazebo/lib/ahtovik_gazebo
+[1.613s] Installing failure_injector_node script to /home/user/ros2_ws/src/install/ahtovik_gazebo/lib/ahtovik_gazebo
+[1.613s] Installing task_allocator_node script to /home/user/ros2_ws/src/install/ahtovik_gazebo/lib/ahtovik_gazebo
+[1.613s] Installing telemetry_publisher_node script to /home/user/ros2_ws/src/install/ahtovik_gazebo/lib/ahtovik_gazebo
+[1.613s] writing list of installed files to '/home/user/ros2_ws/src/build/ahtovik_gazebo/install.log'
+[1.639s] Invoked command in '/home/user/ros2_ws/src/ahtovik_gazebo' returned '0': PYTHONPATH=/home/user/ros2_ws/src/build/ahtovik_gazebo/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/user/ros2_ws/src/install/ahtovik_gazebo/lib/python3.10/site-packages:${PYTHONPATH} _=/usr/bin/env /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../build/ahtovik_gazebo build --build-base /home/user/ros2_ws/src/build/ahtovik_gazebo/build install --record /home/user/ros2_ws/src/build/ahtovik_gazebo/install.log --single-version-externally-managed install_data
