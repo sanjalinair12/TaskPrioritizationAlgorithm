@@ -1,0 +1,113 @@
+#!/usr/bin/env python3
+import math
+import numpy as np
+import rclpy
+from rclpy.node import Node
+from std_msgs.msg import String
+
+class RobotState:
+    def __init__(self, robot_id, robot_type):
+        self.robot_id = robot_id
+        self.robot_type = robot_type
+        self.battery = 100.0
+        self.health = 1.0
+        self.payload = 0.0
+        self.speed = 0.0
+        self.distance = 0.0
+        self.available = True
+        self.last_q = {}
+
+class AhToVikAllocator(Node):
+    def __init__(self):
+        super().__init__('ahtovik_task_allocator')
+        self.v = 0.5
+        self.weights = np.array([0.25, 0.25, 0.20, 0.20, 0.10])
+        self.tasks = {
+            'Scan and Rescue': {'scores': np.array([0.25,0.30,0.05,0.25,0.15]), 'requirements': {'Drone':1, 'Ground Robot':2}},
+            'Supply Necessities': {'scores': np.array([0.20,0.20,0.35,0.10,0.15]), 'requirements': {'Ground Robot':1, 'Creeper Robot':1}},
+            'Lifting Remains': {'scores': np.array([0.15,0.25,0.40,0.05,0.15]), 'requirements': {'Ground Robot':1, 'Creeper Robot':1}},
+        }
+        self.robots = {}
+        self.assignment_pub = self.create_publisher(String, '/ahtovik/task_assignments', 10)
+        self.create_subscription(String, '/ahtovik/robot_telemetry', self.telemetry_callback, 10)
+        self.create_subscription(String, '/ahtovik/failure_events', self.failure_callback, 10)
+        self.timer = self.create_timer(2.0, self.allocate_tasks)
+        self.get_logger().info('AhToVik allocator started.')
+
+    def telemetry_callback(self, msg):
+        try:
+            data = [x.strip() for x in msg.data.split(',')]
+            robot_id, robot_type = data[0], data[1]
+            if robot_id not in self.robots:
+                self.robots[robot_id] = RobotState(robot_id, robot_type)
+            r = self.robots[robot_id]
+            r.battery = float(data[2]); r.health = float(data[3]); r.payload = float(data[4])
+            r.speed = float(data[5]); r.distance = float(data[6]); r.available = bool(int(data[7]))
+        except Exception as e:
+            self.get_logger().warn(f'Bad telemetry: {msg.data} | {e}')
+
+    def failure_callback(self, msg):
+        rid = msg.data.strip()
+        if rid in self.robots:
+            self.robots[rid].available = False
+            self.get_logger().warn(f'Failure event received: {rid}')
+            self.allocate_tasks()
+
+    def robot_vec(self, r):
+        distance_score = 1.0 / (1.0 + r.distance)
+        return np.array([r.battery/100.0, r.health, r.payload/10.0, r.speed/10.0, distance_score])
+
+    def compute_q(self, robots, task_scores):
+        if not robots:
+            return []
+        matrix = np.array([self.robot_vec(r) for r in robots])
+        weighted = matrix * self.weights * task_scores
+        pis, nis = np.max(weighted, axis=0), np.min(weighted, axis=0)
+        d_plus = np.sqrt(np.sum((weighted - pis)**2, axis=1))
+        d_minus = np.sqrt(np.sum((weighted - nis)**2, axis=1))
+        dp_min, dp_max = np.min(d_plus), np.max(d_plus)
+        dm_min, dm_max = np.min(d_minus), np.max(d_minus)
+        q = []
+        for i in range(len(robots)):
+            t1 = (d_plus[i]-dp_min)/(dp_max-dp_min) if dp_max != dp_min else 0.0
+            t2 = (dm_max-d_minus[i])/(dm_max-dm_min) if dm_max != dm_min else 0.0
+            q.append(self.v*t1 + (1-self.v)*t2)
+        return q
+
+    def allocate_tasks(self):
+        available = [r for r in self.robots.values() if r.available]
+        if not available:
+            self.get_logger().warn('No available robots yet.')
+            return
+        used = set(); output = []
+        for task_name, info in self.tasks.items():
+            q_vals = self.compute_q(available, info['scores'])
+            for r, q in zip(available, q_vals):
+                r.last_q[task_name] = q
+            ranked = sorted(available, key=lambda r: r.last_q.get(task_name, math.inf))
+            output.append(f'TASK: {task_name}')
+            team = []
+            for r_type, count in info['requirements'].items():
+                candidates = [r for r in ranked if r.robot_type == r_type and r.robot_id not in used]
+                selected = candidates[:count]
+                for s in selected:
+                    used.add(s.robot_id)
+                team.extend(selected)
+            if len(team) < sum(info['requirements'].values()):
+                output.append('  STATUS: PARTIAL_OR_FAILED')
+            for idx, r in enumerate(team):
+                role = 'PRIMARY' if idx == 0 else 'STANDBY'
+                output.append(f'  {role}: {r.robot_id}, type={r.robot_type}, Q={r.last_q.get(task_name, math.inf):.4f}')
+        msg = String(); msg.data = '\n'.join(output)
+        self.assignment_pub.publish(msg)
+        self.get_logger().info('\n' + msg.data)
+
+def main(args=None):
+    rclpy.init(args=args)
+    node = AhToVikAllocator()
+    rclpy.spin(node)
+    node.destroy_node()
+    rclpy.shutdown()
+
+if __name__ == '__main__':
+    main()
