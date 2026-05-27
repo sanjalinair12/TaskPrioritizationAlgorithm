@@ -1,2 +1,0 @@
-experiment_id,algorithm,noise_level,threshold,v,runs,stability_mean,stability_std,churn_mean,churn_std,realloc_mean,runtime_ms_mean,completed_tasks_mean,available_robots_mean,cbba_rounds_mean,cbba_messages_mean,cbba_converged_mean
-manual,ahtovik,0.0,0.1,0.5,1,50.0,,50.0,,74.0,0.2794265747070312,0.0,1.0,0.0,0.0,1.0
