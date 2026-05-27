@@ -70,21 +70,5 @@ Analysis outputs are written to:
 ~/ahtovik_cbba_validation_results/analysis
 ```
 
-Important files:
 
-- `summary_table.csv`
-- `trial_final_rows.csv`
-- `stability_vs_noise.png`
-- `churn_vs_noise.png`
-- `runtime_vs_noise.png`
-- `runtime_scalability.png`
-- `cbba_consensus_rounds.png`
-- `cbba_message_count.png`
 
-## How to describe this in the paper
-
-Use cautious wording:
-
-> The validation compares AhToVik with a CBBA-style consensus baseline implemented within the same ROS 2/Gazebo validation suite. The baseline models bundle construction, conflict resolution, consensus rounds, and communication cost, allowing a controlled comparison of reassignment stability, churn, recovery behavior, and runtime under identical perturbation and failure conditions.
-
-Avoid claiming that this is a complete production CBBA network implementation.
