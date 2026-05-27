@@ -1,0 +1,5 @@
+[console_scripts]
+experiment_logger_node = ahtovik_gazebo.experiment_logger_node:main
+failure_injector_node = ahtovik_gazebo.failure_injector_node:main
+task_allocator_node = ahtovik_gazebo.task_allocator_node:main
+telemetry_publisher_node = ahtovik_gazebo.telemetry_publisher_node:main
