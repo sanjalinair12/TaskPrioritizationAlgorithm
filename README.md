@@ -455,11 +455,7 @@ The framework generates:
 
 * Distributed onboard decision making
 * Human-in-the-loop orchestration
-* Formal runtime verification
-* Digital Twin integration
 * Swarm robotics
-* Edge AI deployment
-* Learning-assisted adaptive orchestration
 * Large-scale heterogeneous robot teams
 
 ---
