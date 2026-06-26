@@ -6,7 +6,7 @@
 # AhToVik: Verification-Aware Resilient Orchestration for Heterogeneous Multi-Robot Systems
 
 <p align="center">
-  <img src="docs/images/ahtovik_architecture.png" alt="AhToVik Architecture" width="900"/>
+  <img src="images/Scenario (1).jpg" alt="AhToVik" width="900"/>
 </p>
 
 ## Overview
@@ -16,6 +16,11 @@
 Unlike traditional task allocation algorithms that optimize only the initial assignment, AhToVik continuously evaluates mission execution, detects failures, verifies recovery decisions, and dynamically re-orchestrates robot teams while preserving operational consistency.
 
 The framework has been developed and evaluated using Search-and-Rescue (SAR) missions involving heterogeneous fleets consisting of UAVs, UGVs, and specialized Creeper robots.
+
+
+<p align="center">
+  <img src="images/Architecture.jpg" alt="AhToVik Architecture" width="900"/>
+</p>
 
 ---
 
@@ -74,7 +79,7 @@ Heterogeneous Team Formation
 
 ---
 
-## 2. Resilient Self-Healing Orchestration (RSSR)
+## 2. Resilient Self-Healing Orchestration 
 
 The second contribution extends the decision-making framework into a **resilient orchestration architecture** capable of maintaining mission continuity during runtime.
 
@@ -107,7 +112,7 @@ Dynamic Re-Orchestration
 Mission Continuity
 ```
 
-### RSSR Contributions
+### Resilience-oriented orchestration Contributions
 
 * Runtime monitoring
 * Failure detection
@@ -122,7 +127,7 @@ The framework is evaluated against conventional recovery strategies under multip
 
 ---
 
-## 3. Verification-Aware Orchestration Lifecycle (ASYDE)
+## 3. Verification-Aware Orchestration Lifecycle 
 
 The third contribution introduces a **verification-aware orchestration lifecycle**, where verification is no longer treated as an offline activity but becomes an integral component of autonomous decision making.
 
@@ -196,7 +201,7 @@ Re-Orchestration
 * Safety verification
 * Re-orchestration validation
 
-This lifecycle enables trustworthy autonomous decision making while reducing unsafe or infeasible recovery actions.
+This lifecycle enables trustworthy autonomous decision-making while reducing unsafe or infeasible recovery actions.
 
 ---
 
@@ -224,7 +229,7 @@ The complete AhToVik framework consists of three tightly integrated layers:
    * Recovery validation
    * Continuous assumption checking
 
-Together these layers provide an end-to-end orchestration framework capable of resilient and verifiable autonomous operation.
+Together, these layers provide an end-to-end orchestration framework capable of resilient and verifiable autonomous operation.
 
 ---
 
