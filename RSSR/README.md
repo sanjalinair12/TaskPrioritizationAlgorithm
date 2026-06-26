@@ -3,3 +3,4 @@ Autonomous multi-agent systems (MAS) operating in dynamic environments require r
 
 
 <img width="1411" height="600" alt="image" src="RSSR/Images/ahtovik_rssr.jpg.jpg" />
+</div>
