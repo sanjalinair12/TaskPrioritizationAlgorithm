@@ -18,7 +18,7 @@ enables multi-criteria evaluation, addresses conflicting criteria, and ensures t
 
 This AhToVIK project implements a multi-robot task assignment algorithm using the Analytic Hierarchy Process (AHP), TOPSIS, and VIKOR methods. The system considers multiple criteria and task types to assign robots to tasks. 
 
-<img width="1411" height="600" alt="image" src="images/AHTOVIK (2).png" />
+<img width="1411" height="600" alt="image" src="images/Architecture.jpg" />
 
 ## Features
 ------------
