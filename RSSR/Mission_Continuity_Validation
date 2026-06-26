@@ -1,0 +1,994 @@
+import numpy as np
+import pandas as pd
+import random
+import time
+import matplotlib.pyplot as plt
+
+
+# =========================================================
+# SECTION 1: DATA INGESTION
+# =========================================================
+
+def get_input_from_excel():
+    file_path = input("Enter the path to your Excel file: ")
+
+    try:
+        df_criteria = pd.read_excel(
+            file_path,
+            sheet_name="Criteria Comparison",
+            index_col=0
+        )
+
+        df_robots = pd.read_excel(
+            file_path,
+            sheet_name="Robots"
+        )
+
+        df_tasks = pd.read_excel(
+            file_path,
+            sheet_name="Tasks",
+            index_col=0
+        )
+
+        criteria_matrix = df_criteria.values.astype(float)
+
+        eigenvalues, eigenvectors = np.linalg.eig(criteria_matrix)
+        max_index = np.argmax(eigenvalues.real)
+
+        weights = eigenvectors[:, max_index].real
+        weights = np.abs(weights)
+        weights = weights / np.sum(weights)
+
+        robots = []
+        for _, row in df_robots.iterrows():
+            robots.append({
+                "ID": row["ID"],
+                "Type": row["Type"],
+                "Values": row.iloc[2:].values.astype(float)
+            })
+
+        tasks = []
+        for task_type, row in df_tasks.iterrows():
+            tasks.append({
+                "Type": task_type,
+                "Scores": row.values.astype(float)
+            })
+
+        return weights, robots, tasks
+
+    except Exception as e:
+        print(f"Error while loading input file: {e}")
+        return None
+
+
+# =========================================================
+# SECTION 2: AHTOVIK Q EVALUATION
+# =========================================================
+
+def evaluate_niche_authority(robots, task_scores, weights, v=0.5):
+    decision_matrix = np.array([r["Values"] for r in robots])
+    weighted_matrix = decision_matrix * weights * task_scores
+
+    pis = np.max(weighted_matrix, axis=0)
+    nis = np.min(weighted_matrix, axis=0)
+
+    d_plus = np.sqrt(np.sum((weighted_matrix - pis) ** 2, axis=1))
+    d_minus = np.sqrt(np.sum((weighted_matrix - nis) ** 2, axis=1))
+
+    dp_min, dp_max = np.min(d_plus), np.max(d_plus)
+    dm_min, dm_max = np.min(d_minus), np.max(d_minus)
+
+    q_indices = []
+
+    for i in range(len(d_plus)):
+        t1 = (
+            (d_plus[i] - dp_min) / (dp_max - dp_min)
+            if (dp_max - dp_min) != 0
+            else 0
+        )
+
+        t2 = (
+            (dm_max - d_minus[i]) / (dm_max - dm_min)
+            if (dm_max - dm_min) != 0
+            else 0
+        )
+
+        q_indices.append(v * t1 + (1 - v) * t2)
+
+    return q_indices
+
+
+# =========================================================
+# SECTION 3: TASK REQUIREMENTS AND ASSIGNMENT
+# =========================================================
+
+def get_task_requirements(task_name):
+    if task_name == "Scan and Rescue":
+        return {"Drone": 1, "Ground Robot": 2}
+    elif task_name == "Supply Necessities":
+        return {"Ground Robot": 1, "Creeper Robot": 1}
+    elif task_name == "Lifting Remains":
+        return {"Ground Robot": 2}
+    else:
+        return {}
+
+
+def form_initial_task_assignments(available_robots, tasks):
+    task_assignments = {}
+
+    for task in tasks:
+        task_name = task["Type"]
+        requirements = get_task_requirements(task_name)
+
+        sorted_for_task = sorted(
+            available_robots,
+            key=lambda x: x[f"Q_{task_name}"]
+        )
+
+        already_assigned = [
+            r for team in task_assignments.values()
+            for r in team
+        ]
+
+        team = []
+
+        for robot_type, count in requirements.items():
+            candidates = [
+                r for r in sorted_for_task
+                if r["Type"] == robot_type
+                and r not in already_assigned
+            ]
+
+            selected = candidates[:count]
+            team.extend(selected)
+            already_assigned.extend(selected)
+
+        task_assignments[task_name] = team
+
+    return task_assignments
+
+
+# =========================================================
+# SECTION 4: RUNTIME MODEL
+# =========================================================
+
+def add_runtime_state_to_robots(robots, seed=42, severity="moderate"):
+    random.seed(seed)
+
+    runtime_robots = []
+
+    for robot in robots:
+        r = robot.copy()
+
+        if severity == "minor":
+            r["Battery"] = random.randint(40, 100)
+            r["Communication"] = random.randint(60, 100)
+
+        elif severity == "moderate":
+            r["Battery"] = random.randint(25, 100)
+            r["Communication"] = random.randint(40, 100)
+
+        elif severity == "critical":
+            r["Battery"] = random.randint(10, 100)
+            r["Communication"] = random.randint(20, 100)
+
+        else:
+            r["Battery"] = random.randint(25, 100)
+            r["Communication"] = random.randint(40, 100)
+
+        r["Operational"] = True
+        runtime_robots.append(r)
+
+    return runtime_robots
+
+
+def clone_assignments_with_runtime_robots(task_assignments, runtime_robots):
+    id_to_robot = {r["ID"]: r for r in runtime_robots}
+
+    return {
+        task_name: [id_to_robot[r["ID"]] for r in team]
+        for task_name, team in task_assignments.items()
+    }
+
+
+def get_active_agents(task_assignments):
+    return [
+        (task_name, robot)
+        for task_name, team in task_assignments.items()
+        for robot in team
+    ]
+
+
+def inject_failure_with_probability(task_assignments, failure_probability):
+    active_agents = get_active_agents(task_assignments)
+
+    if len(active_agents) == 0:
+        return None, None, "no_active_agent"
+
+    if random.random() > failure_probability:
+        return None, None, "no_failure"
+
+    failed_task, failed_robot = random.choice(active_agents)
+    failed_robot["Operational"] = False
+
+    return failed_task, failed_robot, "failure_injected"
+
+
+def reduce_standby_pool(runtime_robots, task_assignments, standby_ratio=1.0):
+    """
+    Simulates limited standby availability.
+    standby_ratio = 1.0 keeps all standby robots.
+    standby_ratio = 0.1 keeps only 10% of standby robots.
+    """
+    assigned_ids = {
+        r["ID"]
+        for team in task_assignments.values()
+        for r in team
+    }
+
+    active = [
+        r for r in runtime_robots
+        if r["ID"] in assigned_ids
+    ]
+
+    standby = [
+        r for r in runtime_robots
+        if r["ID"] not in assigned_ids
+    ]
+
+    keep_count = max(1, int(len(standby) * standby_ratio))
+    kept_standby = random.sample(standby, keep_count)
+
+    return active + kept_standby
+
+
+# =========================================================
+# SECTION 5: RECOVERY VERIFICATION
+# =========================================================
+
+def verify_candidate(candidate, failed_robot, verification_enabled=True):
+    if candidate is None:
+        return False, "no_candidate"
+
+    if not verification_enabled:
+        return True, "verification_disabled"
+
+    if candidate["Type"] != failed_robot["Type"]:
+        return False, "capability_mismatch"
+
+    if candidate.get("Operational", True) is False:
+        return False, "candidate_not_operational"
+
+    if candidate.get("Battery", 100) < 30:
+        return False, "battery_below_threshold"
+
+    if candidate.get("Communication", 100) < 50:
+        return False, "communication_below_threshold"
+
+    return True, "verified"
+
+
+def would_candidate_be_invalid(candidate, failed_robot):
+    valid, _ = verify_candidate(
+        candidate,
+        failed_robot,
+        verification_enabled=True
+    )
+    return not valid
+
+
+# =========================================================
+# SECTION 6: RECOVERY STRATEGIES
+# =========================================================
+
+def ahtovik_recovery(
+    failed_task,
+    failed_robot,
+    current_assignments,
+    runtime_robots,
+    verification_enabled=True
+):
+    """
+    AHTOVIK:
+    Selects the same-type standby candidate with best task-specific Q.
+    """
+    start_time = time.time()
+
+    already_assigned = [
+        r for team in current_assignments.values()
+        for r in team
+    ]
+
+    candidates = [
+        r for r in runtime_robots
+        if r not in already_assigned
+        and r["Type"] == failed_robot["Type"]
+    ]
+
+    candidates = sorted(
+        candidates,
+        key=lambda x: x.get(f"Q_{failed_task}", float("inf"))
+    )
+
+    selected = candidates[0] if candidates else None
+
+    invalid_without_verification = would_candidate_be_invalid(
+        selected,
+        failed_robot
+    )
+
+    verified, reason = verify_candidate(
+        selected,
+        failed_robot,
+        verification_enabled
+    )
+
+    if not verified:
+        return False, False, time.time() - start_time, selected, reason, invalid_without_verification
+
+    current_assignments[failed_task] = [
+        selected if r == failed_robot else r
+        for r in current_assignments[failed_task]
+    ]
+
+    return True, True, time.time() - start_time, selected, reason, invalid_without_verification
+
+
+def random_recovery(
+    failed_task,
+    failed_robot,
+    current_assignments,
+    runtime_robots,
+    verification_enabled=True
+):
+    """
+    Random recovery baseline:
+    Random same-type standby promotion.
+    """
+    start_time = time.time()
+
+    already_assigned = [
+        r for team in current_assignments.values()
+        for r in team
+    ]
+
+    candidates = [
+        r for r in runtime_robots
+        if r not in already_assigned
+        and r["Type"] == failed_robot["Type"]
+    ]
+
+    selected = random.choice(candidates) if candidates else None
+
+    invalid_without_verification = would_candidate_be_invalid(
+        selected,
+        failed_robot
+    )
+
+    verified, reason = verify_candidate(
+        selected,
+        failed_robot,
+        verification_enabled
+    )
+
+    if not verified:
+        return False, False, time.time() - start_time, selected, reason, invalid_without_verification
+
+    current_assignments[failed_task] = [
+        selected if r == failed_robot else r
+        for r in current_assignments[failed_task]
+    ]
+
+    return True, True, time.time() - start_time, selected, reason, invalid_without_verification
+
+
+def first_available_recovery(
+    failed_task,
+    failed_robot,
+    current_assignments,
+    runtime_robots,
+    verification_enabled=True
+):
+    """
+    First-available recovery baseline:
+    Promotes the first same-type standby.
+    """
+    start_time = time.time()
+
+    already_assigned = [
+        r for team in current_assignments.values()
+        for r in team
+    ]
+
+    candidates = [
+        r for r in runtime_robots
+        if r not in already_assigned
+        and r["Type"] == failed_robot["Type"]
+    ]
+
+    selected = candidates[0] if candidates else None
+
+    invalid_without_verification = would_candidate_be_invalid(
+        selected,
+        failed_robot
+    )
+
+    verified, reason = verify_candidate(
+        selected,
+        failed_robot,
+        verification_enabled
+    )
+
+    if not verified:
+        return False, False, time.time() - start_time, selected, reason, invalid_without_verification
+
+    current_assignments[failed_task] = [
+        selected if r == failed_robot else r
+        for r in current_assignments[failed_task]
+    ]
+
+    return True, True, time.time() - start_time, selected, reason, invalid_without_verification
+
+
+def no_recovery(
+    failed_task,
+    failed_robot,
+    current_assignments,
+    runtime_robots,
+    verification_enabled=True
+):
+    """
+    No-recovery baseline:
+    Mission does not continue after failure.
+    """
+    start_time = time.time()
+
+    return False, False, time.time() - start_time, None, "mission_aborted", False
+
+
+# =========================================================
+# SECTION 7: VALIDATION LOOP
+# =========================================================
+
+def run_single_validation_setting(
+    task_assignments,
+    available_robots,
+    algorithm="AHTOVIK",
+    failure_probability=0.3,
+    verification_enabled=True,
+    num_runs=500,
+    seed=42,
+    severity="moderate",
+    standby_ratio=1.0
+):
+    random.seed(seed)
+    np.random.seed(seed)
+
+    results = []
+
+    for run in range(1, num_runs + 1):
+
+        runtime_robots = add_runtime_state_to_robots(
+            available_robots,
+            seed=seed + run,
+            severity=severity
+        )
+
+        current_assignments = clone_assignments_with_runtime_robots(
+            task_assignments,
+            runtime_robots
+        )
+
+        runtime_robots = reduce_standby_pool(
+            runtime_robots,
+            current_assignments,
+            standby_ratio=standby_ratio
+        )
+
+        failed_task, failed_robot, failure_status = inject_failure_with_probability(
+            current_assignments,
+            failure_probability
+        )
+
+        if failed_robot is None:
+            results.append({
+                "algorithm": algorithm,
+                "run": run,
+                "failure_probability": failure_probability,
+                "verification_enabled": verification_enabled,
+                "severity": severity,
+                "standby_ratio": standby_ratio,
+                "failure_detected": False,
+                "failed_task": None,
+                "failed_robot": None,
+                "replacement_robot": None,
+                "recovery_success": True,
+                "mission_continued": True,
+                "recovery_time": 0.0,
+                "verification_result": "not_required",
+                "invalid_promotion": False
+            })
+            continue
+
+        if algorithm == "AHTOVIK":
+            recovery_success, mission_continued, recovery_time, replacement, reason, invalid_without_verification = ahtovik_recovery(
+                failed_task,
+                failed_robot,
+                current_assignments,
+                runtime_robots,
+                verification_enabled
+            )
+
+        elif algorithm == "Random_Recovery":
+            recovery_success, mission_continued, recovery_time, replacement, reason, invalid_without_verification = random_recovery(
+                failed_task,
+                failed_robot,
+                current_assignments,
+                runtime_robots,
+                verification_enabled
+            )
+
+        elif algorithm == "First_Available":
+            recovery_success, mission_continued, recovery_time, replacement, reason, invalid_without_verification = first_available_recovery(
+                failed_task,
+                failed_robot,
+                current_assignments,
+                runtime_robots,
+                verification_enabled
+            )
+
+        elif algorithm == "No_Recovery":
+            recovery_success, mission_continued, recovery_time, replacement, reason, invalid_without_verification = no_recovery(
+                failed_task,
+                failed_robot,
+                current_assignments,
+                runtime_robots,
+                verification_enabled
+            )
+
+        invalid_promotion = (
+            verification_enabled is False
+            and replacement is not None
+            and invalid_without_verification is True
+        )
+
+        if invalid_promotion:
+            mission_continued = False
+
+        results.append({
+            "algorithm": algorithm,
+            "run": run,
+            "failure_probability": failure_probability,
+            "verification_enabled": verification_enabled,
+            "severity": severity,
+            "standby_ratio": standby_ratio,
+            "failure_detected": True,
+            "failed_task": failed_task,
+            "failed_robot": failed_robot["ID"],
+            "replacement_robot": replacement["ID"] if replacement else None,
+            "recovery_success": recovery_success,
+            "mission_continued": mission_continued,
+            "recovery_time": recovery_time,
+            "verification_result": reason,
+            "invalid_promotion": invalid_promotion
+        })
+
+    return pd.DataFrame(results)
+
+
+def summarize_validation(df):
+    failure_df = df[df["failure_detected"] == True]
+
+    if len(failure_df) == 0:
+        return {
+            "MCR": 100.0,
+            "RSR": 100.0,
+            "Mean_RT": 0.0,
+            "Invalid_Promotions": 0,
+            "Failures": 0
+        }
+
+    successful_df = failure_df[failure_df["recovery_success"] == True]
+
+    return {
+        "MCR": failure_df["mission_continued"].mean() * 100,
+        "RSR": failure_df["recovery_success"].mean() * 100,
+        "Mean_RT": successful_df["recovery_time"].mean() if len(successful_df) > 0 else np.nan,
+        "Invalid_Promotions": int(failure_df["invalid_promotion"].sum()),
+        "Failures": len(failure_df)
+    }
+
+
+# =========================================================
+# SECTION 8: EXPERIMENTS
+# =========================================================
+
+def run_failure_probability_experiment(
+    task_assignments,
+    available_robots,
+    failure_probabilities=[0.1, 0.2, 0.3, 0.4, 0.5],
+    num_runs=500,
+    seed=42
+):
+    algorithms = [
+        "AHTOVIK",
+        "Random_Recovery",
+        "First_Available",
+        "No_Recovery"
+    ]
+
+    all_results = []
+    summary_rows = []
+
+    for algorithm in algorithms:
+        for fp in failure_probabilities:
+
+            df = run_single_validation_setting(
+                task_assignments,
+                available_robots,
+                algorithm=algorithm,
+                failure_probability=fp,
+                verification_enabled=True,
+                num_runs=num_runs,
+                seed=seed,
+                severity="moderate",
+                standby_ratio=1.0
+            )
+
+            all_results.append(df)
+            metrics = summarize_validation(df)
+
+            summary_rows.append({
+                "algorithm": algorithm,
+                "failure_probability": fp,
+                "Mission Continuity Rate (%)": metrics["MCR"],
+                "Recovery Success Rate (%)": metrics["RSR"],
+                "Mean Recovery Time (s)": metrics["Mean_RT"],
+                "Invalid Promotions": metrics["Invalid_Promotions"],
+                "Injected Failures": metrics["Failures"]
+            })
+
+    return pd.concat(all_results, ignore_index=True), pd.DataFrame(summary_rows)
+
+
+def run_verification_ablation(
+    task_assignments,
+    available_robots,
+    failure_probability=0.3,
+    num_runs=500,
+    seed=42
+):
+    algorithms = [
+        "AHTOVIK",
+        "Random_Recovery",
+        "First_Available"
+    ]
+
+    all_results = []
+    summary_rows = []
+
+    for algorithm in algorithms:
+        for verification_enabled in [True, False]:
+
+            df = run_single_validation_setting(
+                task_assignments,
+                available_robots,
+                algorithm=algorithm,
+                failure_probability=failure_probability,
+                verification_enabled=verification_enabled,
+                num_runs=num_runs,
+                seed=seed,
+                severity="critical",
+                standby_ratio=1.0
+            )
+
+            all_results.append(df)
+            metrics = summarize_validation(df)
+
+            summary_rows.append({
+                "algorithm": algorithm,
+                "verification_enabled": verification_enabled,
+                "Mission Continuity Rate (%)": metrics["MCR"],
+                "Recovery Success Rate (%)": metrics["RSR"],
+                "Mean Recovery Time (s)": metrics["Mean_RT"],
+                "Invalid Promotions": metrics["Invalid_Promotions"],
+                "Injected Failures": metrics["Failures"]
+            })
+
+    return pd.concat(all_results, ignore_index=True), pd.DataFrame(summary_rows)
+
+
+def run_failure_severity_experiment(
+    task_assignments,
+    available_robots,
+    num_runs=500,
+    seed=42
+):
+    algorithms = [
+        "AHTOVIK",
+        "Random_Recovery",
+        "First_Available",
+        "No_Recovery"
+    ]
+
+    severities = ["minor", "moderate", "critical"]
+
+    all_results = []
+    summary_rows = []
+
+    for algorithm in algorithms:
+        for severity in severities:
+
+            df = run_single_validation_setting(
+                task_assignments,
+                available_robots,
+                algorithm=algorithm,
+                failure_probability=0.3,
+                verification_enabled=True,
+                num_runs=num_runs,
+                seed=seed,
+                severity=severity,
+                standby_ratio=1.0
+            )
+
+            all_results.append(df)
+            metrics = summarize_validation(df)
+
+            summary_rows.append({
+                "algorithm": algorithm,
+                "severity": severity,
+                "Mission Continuity Rate (%)": metrics["MCR"],
+                "Recovery Success Rate (%)": metrics["RSR"],
+                "Mean Recovery Time (s)": metrics["Mean_RT"],
+                "Invalid Promotions": metrics["Invalid_Promotions"],
+                "Injected Failures": metrics["Failures"]
+            })
+
+    return pd.concat(all_results, ignore_index=True), pd.DataFrame(summary_rows)
+
+
+def run_standby_pool_experiment(
+    task_assignments,
+    available_robots,
+    num_runs=500,
+    seed=42
+):
+    algorithms = [
+        "AHTOVIK",
+        "Random_Recovery",
+        "First_Available",
+        "No_Recovery"
+    ]
+
+    standby_ratios = [1.0, 0.5, 0.25, 0.1]
+
+    all_results = []
+    summary_rows = []
+
+    for algorithm in algorithms:
+        for ratio in standby_ratios:
+
+            df = run_single_validation_setting(
+                task_assignments,
+                available_robots,
+                algorithm=algorithm,
+                failure_probability=0.3,
+                verification_enabled=True,
+                num_runs=num_runs,
+                seed=seed,
+                severity="moderate",
+                standby_ratio=ratio
+            )
+
+            all_results.append(df)
+            metrics = summarize_validation(df)
+
+            summary_rows.append({
+                "algorithm": algorithm,
+                "standby_ratio": ratio,
+                "Mission Continuity Rate (%)": metrics["MCR"],
+                "Recovery Success Rate (%)": metrics["RSR"],
+                "Mean Recovery Time (s)": metrics["Mean_RT"],
+                "Invalid Promotions": metrics["Invalid_Promotions"],
+                "Injected Failures": metrics["Failures"]
+            })
+
+    return pd.concat(all_results, ignore_index=True), pd.DataFrame(summary_rows)
+
+
+# =========================================================
+# SECTION 9: PLOTS
+# =========================================================
+
+def plot_line_summary(summary_df, x_col, y_col, title, xlabel, ylabel, filename):
+    plt.figure(figsize=(8, 5))
+
+    for algorithm in summary_df["algorithm"].unique():
+        sub = summary_df[summary_df["algorithm"] == algorithm]
+        plt.plot(
+            sub[x_col],
+            sub[y_col],
+            marker="o",
+            label=algorithm
+        )
+
+    plt.xlabel(xlabel)
+    plt.ylabel(ylabel)
+    plt.title(title)
+    plt.ylim(0, 105)
+    plt.grid(True)
+    plt.legend()
+    plt.tight_layout()
+    plt.savefig(filename, dpi=300)
+    plt.show()
+
+
+def plot_bar_summary(summary_df, group_col, y_col, title, ylabel, filename):
+    pivot = summary_df.pivot(
+        index=group_col,
+        columns="algorithm",
+        values=y_col
+    )
+
+    pivot.plot(kind="bar", figsize=(9, 5))
+    plt.ylabel(ylabel)
+    plt.title(title)
+    plt.ylim(0, 105)
+    plt.grid(axis="y")
+    plt.tight_layout()
+    plt.savefig(filename, dpi=300)
+    plt.show()
+
+
+def plot_verification_ablation(ablation_summary):
+    labels = []
+
+    for _, row in ablation_summary.iterrows():
+        mode = "ON" if row["verification_enabled"] else "OFF"
+        labels.append(f"{row['algorithm']}\n{mode}")
+
+    x = np.arange(len(labels))
+
+    plt.figure(figsize=(10, 5))
+    plt.bar(
+        x,
+        ablation_summary["Invalid Promotions"]
+    )
+
+    plt.xticks(x, labels, rotation=15)
+    plt.ylabel("Invalid Promotions")
+    plt.title("Verification ON/OFF Ablation")
+    plt.grid(axis="y")
+    plt.tight_layout()
+    plt.savefig("verification_ablation_invalid_promotions.png", dpi=300)
+    plt.show()
+
+
+# =========================================================
+# SECTION 10: MAIN
+# =========================================================
+
+def main():
+    data = get_input_from_excel()
+
+    if data is None:
+        raise Exception("Input file could not be loaded.")
+
+    weights, robots, tasks = data
+    available_robots = list(robots)
+
+    for task in tasks:
+        task_name = task["Type"]
+
+        q_values = evaluate_niche_authority(
+            available_robots,
+            task["Scores"],
+            weights
+        )
+
+        for i, robot in enumerate(available_robots):
+            robot[f"Q_{task_name}"] = q_values[i]
+
+    task_assignments = form_initial_task_assignments(
+        available_robots,
+        tasks
+    )
+
+    print("\n--- Initial Task Assignments ---")
+    for task_name, team in task_assignments.items():
+        print(f"\n{task_name}")
+        for robot in team:
+            print(
+                f"{robot['ID']} "
+                f"{robot['Type']} "
+                f"Q={robot[f'Q_{task_name}']:.4f}"
+            )
+
+    fp_results, fp_summary = run_failure_probability_experiment(
+        task_assignments,
+        available_robots,
+        num_runs=500,
+        seed=42
+    )
+
+    ablation_results, ablation_summary = run_verification_ablation(
+        task_assignments,
+        available_robots,
+        num_runs=500,
+        seed=42
+    )
+
+    severity_results, severity_summary = run_failure_severity_experiment(
+        task_assignments,
+        available_robots,
+        num_runs=500,
+        seed=42
+    )
+
+    standby_results, standby_summary = run_standby_pool_experiment(
+        task_assignments,
+        available_robots,
+        num_runs=500,
+        seed=42
+    )
+
+    print("\n--- Failure Probability Summary ---")
+    print(fp_summary)
+
+    print("\n--- Verification Ablation Summary ---")
+    print(ablation_summary)
+
+    print("\n--- Failure Severity Summary ---")
+    print(severity_summary)
+
+    print("\n--- Standby Pool Summary ---")
+    print(standby_summary)
+
+    fp_results.to_csv("rssr_failure_probability_results.csv", index=False)
+    fp_summary.to_csv("rssr_failure_probability_summary.csv", index=False)
+
+    ablation_results.to_csv("rssr_verification_ablation_results.csv", index=False)
+    ablation_summary.to_csv("rssr_verification_ablation_summary.csv", index=False)
+
+    severity_results.to_csv("rssr_failure_severity_results.csv", index=False)
+    severity_summary.to_csv("rssr_failure_severity_summary.csv", index=False)
+
+    standby_results.to_csv("rssr_standby_pool_results.csv", index=False)
+    standby_summary.to_csv("rssr_standby_pool_summary.csv", index=False)
+
+    plot_line_summary(
+        fp_summary,
+        x_col="failure_probability",
+        y_col="Mission Continuity Rate (%)",
+        title="Failure Probability vs Mission Continuity",
+        xlabel="Failure Probability",
+        ylabel="Mission Continuity Rate (%)",
+        filename="failure_probability_vs_mission_continuity.png"
+    )
+
+    plot_bar_summary(
+        severity_summary,
+        group_col="severity",
+        y_col="Mission Continuity Rate (%)",
+        title="Failure Severity vs Mission Continuity",
+        ylabel="Mission Continuity Rate (%)",
+        filename="failure_severity_vs_mission_continuity.png"
+    )
+
+    plot_line_summary(
+        standby_summary,
+        x_col="standby_ratio",
+        y_col="Mission Continuity Rate (%)",
+        title="Standby Pool Size vs Mission Continuity",
+        xlabel="Standby Pool Ratio",
+        ylabel="Mission Continuity Rate (%)",
+        filename="standby_pool_vs_mission_continuity.png"
+    )
+
+    plot_verification_ablation(ablation_summary)
+
+    print("\nSaved CSV and PNG validation outputs.")
+
+
+if __name__ == "__main__":
+    main()
