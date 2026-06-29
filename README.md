@@ -459,7 +459,7 @@ The framework generates:
 * Large-scale heterogeneous robot teams
 
 ---
-# RSSR 2026 ASE Conference Workshop Release
+# Permanent Repository
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.21028466.svg)](https://doi.org/10.5281/zenodo.21028466)
 
 
