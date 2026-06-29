@@ -459,6 +459,8 @@ The framework generates:
 * Large-scale heterogeneous robot teams
 
 ---
+# RSSR Release
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.21028466.svg)](https://doi.org/10.5281/zenodo.21028466)
 
 
 
