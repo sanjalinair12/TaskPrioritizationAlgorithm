@@ -1,8 +1,7 @@
 # AhToVik 30-Robot Animated Gazebo Motion Demo
 
-This suite turns the previous static AhToVik visualization into a video-ready Gazebo demonstration.
 
-## What it shows
+## Environment
 - 10 drones: D1-D10
 - 10 ground robots: G1-G10
 - 10 creepers: C1-C10
@@ -51,7 +50,7 @@ ros2 pkg list | grep ahtovik
 ros2 launch ahtovik_gazebo ahtovik_30_robot_motion_demo.launch.py
 ```
 
-Gazebo will open and the AhToVik motion node will run automatically.
+Gazebo will open, and the AhToVik motion node will run automatically.
 
 ## If Gazebo opens but robots do not move
 Open another terminal:
