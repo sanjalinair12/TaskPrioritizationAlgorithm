@@ -1,0 +1,10 @@
+cff-version: 1.2.0
+title: "TaskPrioritizationAlgorithm"
+authors:
+  - family-names: Santhosh
+    given-names: Anjali
+version: "1.0.0"
+doi: 10.5281/zenodo.21028466
+date-released: 2026-06-29
+repository-code: https://github.com/sanjalinair12/TaskPrioritizationAlgorithm
+license: MIT
