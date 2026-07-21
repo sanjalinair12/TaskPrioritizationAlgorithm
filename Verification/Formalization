@@ -1,0 +1,419 @@
+# Verification-Aware Orchestration Process
+
+The verification-aware orchestration process is represented as:
+
+```
+S_0 --V_1--> S_1 --V_2--> S_2 --V_3--> S_3 --V_4--> S_4
+```
+
+where:
+
+- **S_0** denotes the initial orchestration specification
+- **S_1** denotes the verified planning state
+- **S_2** denotes the verified allocation state
+- **S_3** denotes the verified execution state
+- **S_4** denotes the verified recovery state
+
+Unlike conventional orchestration lifecycles, the framework does not propagate decisions directly between lifecycle stages. Instead, every transition is governed by an explicit verification function. Each verification function is defined as a state transformation:
+
+```
+V_i : S_(i-1) → S_i,   for i in {1, 2, 3, 4}
+```
+
+subject to:
+
+```
+Φ_i(S_(i-1)) = 1
+```
+
+where **Φ_i** denotes the conjunction of verification predicates associated with transition V_i.
+
+The transition semantics are defined as:
+
+```
+V_i(S_(i-1)) = S_i        if Φ_i(S_(i-1)) = 1
+V_i(S_(i-1)) = S_(i-1)    if Φ_i(S_(i-1)) = 0
+```
+
+Therefore, a successor state is established only when all assumptions required by the corresponding orchestration activity are verified. Otherwise, the decision artifact is not propagated, and the orchestration process remains at the current stage until corrective actions, alternative decisions, or recovery procedures establish a valid state.
+
+Rather than verifying individual software components or autonomous agents in isolation, each checkpoint verifies the assumptions that justify a transition to the next orchestration state. These assumptions concern mission objectives, task definitions, agent capabilities, resource availability, operational constraints, communication conditions, environmental conditions, execution progress, and recovery opportunities.
+
+Each orchestration transition is formalized below.
+
+---
+
+## 1. Planning Verification: S_0 → (V_1) → S_1
+
+The initial orchestration specification is represented as:
+
+```
+S_0 = < M, T, A, R, C, K >
+```
+
+where:
+
+- **M** is the set of mission objectives
+- **T** is the set of mission tasks
+- **A** is the set of available autonomous agents
+- **R** is the set of observable resources
+- **C** is the set of operational constraints
+- **K** is the set of decision criteria
+
+The first verification function determines whether the orchestration specification contains sufficient and consistent information to support mission planning. It is defined as:
+
+```
+V_1 : S_0 → S_1
+```
+
+The planning verification condition is:
+
+```
+Φ_1(S_0) = φ_obj AND φ_task AND φ_cap AND φ_crit AND φ_con AND φ_res
+```
+
+where:
+
+- φ_obj = Defined(M)
+- φ_task = Specified(T)
+- φ_cap = Declared(A)
+- φ_crit = Available(K)
+- φ_con = Consistent(C, M, T)
+- φ_res = Observable(R)
+
+Hence, Φ_1(S_0) = 1 holds only when mission objectives are defined, tasks are specified, agent capabilities are declared, decision criteria are available, constraints are consistent, and the relevant resource attributes are observable.
+
+The verified planning state is represented as:
+
+```
+S_1 = < M, T^p, A, R, C, K, D_p^v >
+```
+
+where **T^p** denotes the planned task structure and **D_p^v** denotes the verified planning decision artifact.
+
+The transition is therefore:
+
+```
+S_1 = V_1(S_0)   if and only if   Φ_1(S_0) = 1
+```
+
+---
+
+## 2. Allocation Verification: S_1 → (V_2) → S_2
+
+The second verification function determines whether candidate agents and candidate team formations satisfy the assumptions established in the planning state.
+
+For each task t_k in T^p, let:
+
+```
+Γ_k = { a_j in A : a_j is considered for t_k }
+```
+
+denote the candidate-agent set.
+
+For candidate agent a_j and task t_k, candidate admissibility is defined as:
+
+```
+φ_cand(a_j, t_k) = φ_cap(a_j, t_k) AND φ_resource(a_j, t_k) AND φ_dependency(a_j, t_k)
+                   AND φ_communication(a_j, t_k) AND φ_risk(a_j, t_k)
+```
+
+The capability predicate is:
+
+```
+φ_cap(a_j, t_k) = Capability(a_j) >= Requirement(t_k)
+```
+
+The resource predicate is:
+
+```
+φ_resource(a_j, t_k) = ResourceState(a_j) >= ResourceDemand(t_k)
+```
+
+The dependency predicate is:
+
+```
+φ_dependency(a_j, t_k) = DependenciesSatisfied(t_k)
+```
+
+The communication predicate is:
+
+```
+φ_communication(a_j, t_k) = q_comm(a_j) >= θ_comm
+```
+
+where q_comm(a_j) denotes the observed communication quality and θ_comm denotes the minimum admissible communication threshold.
+
+The risk predicate is:
+
+```
+φ_risk(a_j, t_k) = ρ(a_j, t_k) <= θ_risk
+```
+
+where ρ(a_j, t_k) denotes the estimated operational risk associated with assigning a_j to t_k, and θ_risk denotes the maximum admissible risk.
+
+The feasible candidate set for task t_k is:
+
+```
+Γ_k^f = { a_j in Γ_k : φ_cand(a_j, t_k) = 1 }
+```
+
+Let **D^f** (script D) denote the set of candidate allocations formed from the feasible candidate sets. The allocation verification condition is:
+
+```
+Φ_2(S_1) = ( AND over all t_k in T^p of: Γ_k^f ≠ ∅ ) AND φ_team AND φ_allocation
+```
+
+where:
+
+```
+φ_team       = TeamRequirementsSatisfied(D^f, T^p)
+φ_allocation = ConstraintsSatisfied(D^f, C)
+```
+
+A verified allocation is selected as:
+
+```
+D_a^v = argmin over D in D^f of J(D)
+```
+
+where J(D) is an orchestration-specific decision function that evaluates the operational suitability and risk of candidate allocations.
+
+The verified allocation state is:
+
+```
+S_2 = < M, T^p, A^f, R, C, D_a^v >
+```
+
+where **A^f** denotes the set of agents participating in the verified candidate and allocation space.
+
+The transition is defined as:
+
+```
+S_2 = V_2(S_1)   if and only if   Φ_2(S_1) = 1
+```
+
+---
+
+## 3. Execution Verification: S_2 → (V_3) → S_3
+
+The third verification function determines whether the assumptions supporting the verified allocation remain valid during execution.
+
+Let τ denote the current execution time and let:
+
+```
+O(τ) = < H(τ), Q(τ), P(τ), E(τ), X(τ) >
+```
+
+denote the set of runtime observations, where:
+
+- **H(τ)** denotes agent and resource health
+- **Q(τ)** denotes communication quality
+- **P(τ)** denotes task progress
+- **E(τ)** denotes environmental conditions
+- **X(τ)** denotes agent availability and execution status
+
+For each active assignment (a_j, t_k) in D_a^v, the runtime verification predicate is:
+
+```
+φ_run(a_j, t_k, τ) = φ_available AND φ_health AND φ_communication
+                     AND φ_progress AND φ_environment AND φ_runtime-risk
+```
+
+The availability predicate is:
+
+```
+φ_available = Available(a_j, τ)
+```
+
+The resource-health predicate is:
+
+```
+φ_health = h_j(τ) >= θ_health(t_k)
+```
+
+where h_j(τ) denotes the observed resource-health value of agent a_j.
+
+The communication predicate is:
+
+```
+φ_communication = q_comm(a_j, τ) >= θ_comm
+```
+
+The progress predicate is:
+
+```
+φ_progress = p_k(τ) >= p_k_min(τ)
+```
+
+where p_k(τ) denotes the observed progress of task t_k and p_k_min(τ) denotes its minimum acceptable progress.
+
+The environmental predicate is:
+
+```
+φ_environment = Compatible(E(τ), a_j, t_k)
+```
+
+The runtime-risk predicate is:
+
+```
+φ_runtime-risk = ρ(a_j, t_k, τ) <= θ_runtime
+```
+
+The complete execution verification condition is:
+
+```
+Φ_3(S_2, τ) = AND over all (a_j, t_k) in D_a^v of φ_run(a_j, t_k, τ)
+```
+
+When Φ_3(S_2, τ) = 1, the active allocation remains admissible and execution is authorized to continue.
+
+The verified execution state is represented as:
+
+```
+S_3(τ) = < M, T(τ), A^e(τ), R(τ), E(τ), D_a^v, D_e^v(τ) >
+```
+
+where **D_e^v(τ)** denotes the verified execution authorization.
+
+Thus:
+
+```
+D_e^v(τ) = Continue(D_a^v)     if Φ_3(S_2, τ) = 1
+D_e^v(τ) = Interrupt(Δ(τ))     if Φ_3(S_2, τ) = 0
+```
+
+where:
+
+```
+Δ(τ) = { φ : φ(τ) = 0 }
+```
+
+denotes the set of violated runtime assumptions.
+
+Accordingly, V_3 is evaluated repeatedly throughout execution rather than only once at the beginning of the execution stage.
+
+---
+
+## 4. Recovery Verification: S_3 → (V_4) → S_4
+
+When one or more runtime assumptions are violated, the fourth verification function evaluates the candidate recovery and re-orchestration actions.
+
+Let:
+
+```
+U(τ) = { u_1, u_2, ..., u_m }
+```
+
+denote the set of candidate recovery actions generated in response to the violations in Δ(τ).
+
+For candidate recovery action u_l, recovery admissibility is defined as:
+
+```
+φ_rec(u_l) = φ_logical AND φ_mission AND φ_capability AND φ_resource
+             AND φ_constraint AND φ_risk AND φ_continuation
+```
+
+The logical-consistency predicate is:
+
+```
+φ_logical = Consistent(u_l, Δ(τ))
+```
+
+The mission-compatibility predicate is:
+
+```
+φ_mission = Compatible(u_l, M)
+```
+
+The capability predicate is:
+
+```
+φ_capability = CapabilitiesSufficient(u_l, T(τ))
+```
+
+The resource predicate is:
+
+```
+φ_resource = ResourcesSufficient(u_l, R(τ))
+```
+
+The constraint predicate is:
+
+```
+φ_constraint = ConstraintsSatisfied(u_l, C)
+```
+
+The recovery-risk predicate is:
+
+```
+φ_risk = ρ_rec(u_l, τ) <= θ_rec
+```
+
+where ρ_rec(u_l, τ) denotes the operational risk of applying recovery action u_l.
+
+The mission-continuation predicate is:
+
+```
+φ_continuation = SupportsMissionContinuation(u_l, M, T(τ))
+```
+
+The feasible recovery set is:
+
+```
+U^f(τ) = { u_l in U(τ) : φ_rec(u_l) = 1 }
+```
+
+The complete recovery verification condition is:
+
+```
+Φ_4(S_3, τ) = ( U^f(τ) ≠ ∅ )
+```
+
+Among the feasible alternatives, the verified recovery decision is selected as:
+
+```
+u* = argmin over u_l in U^f(τ) of J_rec(u_l)
+```
+
+where J_rec is an orchestration-specific recovery decision function.
+
+The verified recovery state is represented as:
+
+```
+S_4 = < M^r, T^r, A^r, R^r, C^r, D_r^v >
+```
+
+where:
+
+```
+D_r^v = Apply(u*)
+```
+
+The transition is therefore:
+
+```
+S_4 = V_4(S_3)   if and only if   Φ_4(S_3, τ) = 1
+```
+
+---
+
+## Recovery Re-Evaluation
+
+After successful recovery, the verified recovery state may be re-evaluated through allocation verification or execution verification:
+
+```
+S_4 --V_2--> S_2'
+```
+
+or
+
+```
+S_4 --V_3--> S_3'
+```
+
+Therefore, the complete lifecycle is not strictly linear. Instead, it forms a verification-governed orchestration cycle:
+
+```
+S_0 --V_1--> S_1 --V_2--> S_2 --V_3--> S_3 --V_4--> S_4 --(V_2 or V_3)--> S'
+```
